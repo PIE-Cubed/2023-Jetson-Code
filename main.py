@@ -11,12 +11,10 @@ from apriltags import Detector
 detector = Detector()
 
 # Create VideoCapture 0 and get its properties
-cam0Id     = 0
-camera0    = USBCamera(cam0Id)
-cap0       = camera0.autoResize()
-resolution = camera0.getResolution()
-ret, cameraMatrix, distortion, rvecs, tvecs = camera0.calibrateCamera(cap0)
-camera0Properties = (cameraMatrix[0][0], cameraMatrix[1][1], cameraMatrix[0][2], cameraMatrix[1][2])  # fx, fy, cx, cy
+camera0        = USBCamera(0)
+cap0           = camera0.autoResize()
+cam0resolution = camera0.getResolution()
+ret, cam0Matrix, cam0distortion, rvecs, tvecs = camera0.calibrateCamera(cap0)
 
 def undistort(stream, cameraMatrix, distortion, resolution: tuple):
     """
@@ -48,10 +46,10 @@ while (cap0.isOpened() == True):
     cv.flip(stream, 1)
 
     # Undistorts the image
-    stream = undistort(cameraMatrix, distortion, resolution)
+    stream = undistort(cam0Matrix, cam0distortion, cam0resolution)
 
     # Runs apriltag detection on the image
-    results, stream = detector.detectTags(stream, camera0Properties, )
+    results, stream = detector.dtDetectTags(stream, cam0Matrix, 3, 1, False)
 
     # Display the capture
     cv.imshow("Stream", stream)
