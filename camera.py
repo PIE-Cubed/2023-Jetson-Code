@@ -3,7 +3,7 @@
 # Import Libraries
 import cv2 as cv
 
-# Import classes
+# Import Classes
 from calibration import Calibrate
 
 # CONSTANTS

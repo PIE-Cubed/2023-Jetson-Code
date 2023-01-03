@@ -14,7 +14,7 @@ criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 # Creates the Calibrate class
 class Calibrate:
-    def __init__(self, cap: cv.VideoCapture, camNum: int) -> None:
+    def __init__(self, cap, camNum: int) -> None:
         """
         Constructor for the Calibrate class.
         @param VideoCapture
@@ -37,7 +37,7 @@ class Calibrate:
         self.imgPoints = []  # 2D point in image plane
 
         # Path to calibration images
-        self.PATH = "./camera%s-%sx%s-images/" % (self.camNum, self.width, self.height)
+        self.PATH = "./camera{}-{}x{}-images/".format(self.camNum, self.width, self.height)
 
         # File extension
         self.EXTENSION = ".png"
@@ -99,7 +99,7 @@ class Calibrate:
         self.ret, self.cameraMatrix, self.distortion, self.rvecs, self.tvecs = cv.calibrateCamera(self.objPoints, self.imgPoints, gray.shape[::-1], None, None)
 
         # Print calibration reults
-        print("Camera %s calibrated: " % (self.camNum), self.ret)
+        print("Camera {} calibrated: ".format(self.camNum), self.ret)
         print("\nCamera Matrix:\n", self.cameraMatrix)
         print("\nDistortion Parameters:\n", self.distortion)
         print("\Rotation Vectors:\n", self.rvecs)
@@ -107,7 +107,7 @@ class Calibrate:
 
         # Prints the reprediction error
         repredictError = self.calculateRepredictionError()
-        print("\nCamera %s Total error: %s" % (self.camNum, repredictError) )
+        print("\nCamera {} Total error: {}".format(self.camNum, repredictError) )
 
         # Return calibration results
         return self.ret, self.cameraMatrix, self.distortion, self.rvecs, self.tvecs
@@ -125,7 +125,7 @@ class Calibrate:
             j = i + 1
 
             # Prints target image
-            print("Attempting to take calibration image %s" % j)
+            print("Attempting to take calibration image {}".format(j))
 
             # Resets imgSelected
             imgSelected = False
@@ -158,10 +158,10 @@ class Calibrate:
                 # Press p to take a calibration image
                 if ( cv.waitKey(1) == ord("p") ):
                     # Writes the image
-                    cv.imwrite(self.PATH + str(j) + self.EXTENSION, stream)
+                    cv.imwrite(self.PATH + "{}".format(j) + self.EXTENSION, stream)
 
                     # Prints the status
-                    print("Calibration image %s taken" % j)
+                    print("Calibration image {} taken".format(j))
 
                     # Breaks the while loop
                     imgSelected = True
