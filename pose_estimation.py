@@ -2,12 +2,13 @@
 
 # Import Libraries
 import numpy as np
-from wpimath.geometry._geometry import *
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.kinematics._kinematics import SwerveDrive4Kinematics, SwerveDrive4Odometry, SwerveModulePosition
+from wpimath.geometry._geometry import *
+from wpimath.kinematics._kinematics  import SwerveDrive4Kinematics, SwerveDrive4Odometry, SwerveModulePosition
+from wpimath._controls._controls.controller import PIDController
 
 # Import Classes
-from Units import Units
+from Units          import Units
 from communications import NetworkCommunications
 
 # Robot dimensions measured from the center of each wheel (inches)
@@ -73,8 +74,8 @@ class PoseEstimator:
         Resets both pose trackers to a certian pose
         @param pose: Pose2d
         """
-        self.resetOdometry()
-        self.resetPoseEstimator()
+        self.resetOdometry(pose)
+        self.resetPoseEstimator(pose)
 
     def resetOdometry(self, pose: Pose2d):
         """
@@ -87,7 +88,7 @@ class PoseEstimator:
         # Resets the SwerveOdometry
         self.odometry.resetPosition(self.generateRot2d(), pose, allPositiions[0], allPositiions[1], allPositiions[2], allPositiions[3])
 
-    def resetPoseEstimator(self, pose):
+    def resetPoseEstimator(self, pose: Pose2d):
         """
         Resets the SwervePoseEstimator to a pose.
         @param pose: Pose2d
@@ -162,7 +163,8 @@ class PoseEstimator:
 
     def getBestResult(self, results):
         """
-        @return
+        Returns a Pose3d of the entry with the least error.
+        @return bestPose3d
         """
         # Variables
         i = 0
@@ -171,7 +173,7 @@ class PoseEstimator:
 
         # Loops through all Data
         for result in results:
-            error = result[0]
+            error = result[1]
 
             if (error < minError):
                 error = minError
@@ -184,7 +186,7 @@ class PoseEstimator:
         flatPose = np.array(results[bestResult][2]).flatten()
 
         # Extracts Euler's Angles
-        flatAngles = np.array(results[bestResult[3]]).flatten()
+        flatAngles = np.array(results[bestResult][3]).flatten()
 
         # Extracts the x, y, and z translations
         x, y, z = flatPose[3], flatPose[7], flatPose[11]
@@ -192,16 +194,21 @@ class PoseEstimator:
         # Extracts the tag's roll, yaw, and pitch
         pitch, yaw, roll = flatAngles[3], flatAngles[7], flatAngles[11]
 
-        return Pose3d(Transform3d(x, y, z), Rotation3d(roll, pitch, yaw))
+        # Sends the best result to the Rio
+        self.comms.sendBestResult(results[bestResult])
+
+        return Pose3d(Translation3d(x, y, z), Rotation3d(roll, pitch, yaw))
 
     def getHeading(self):
         """
-        @return
+        Returns the robot's heading.
+        @return robotYaw
         """
         return self.comms.getGyroYaw()
 
     def generateRot2d(self, degrees):
         """
-        @return
+        Generates a Rotation2d from degrees.
+        @return Rotation2d
         """
         return Rotation2d(Units.radiansToDegrees(degrees))

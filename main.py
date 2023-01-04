@@ -9,8 +9,8 @@ from apriltags import Detector
 from communications import NetworkCommunications
 
 # Instance creation
+detector = Detector()
 nComms   = NetworkCommunications()
-detector = Detector(nComms)
 
 # Creates a VideoCapture and gets its properties
 camera        = USBCamera(0)
@@ -22,15 +22,13 @@ ret, camMatrix, camdistortion, rvecs, tvecs = camera.calibrateCamera(cap)
 while (cap.isOpened() == True):
     # Read the capture
     sucess, stream = cap.read()
- 
-    # Flips the image
-    cv.flip(stream, 1)
 
     # Undistorts the image
-    stream = detector.undistort(camMatrix, camdistortion, camresolution)
+    stream = detector.undistort(stream, camMatrix, camdistortion, camresolution)
 
     # Runs apriltag detection on the undistorted image
-    results, stream = detector.detectTags(stream, camMatrix, 2, 1, False)
+    results, stream = detector.detectTags(stream, camMatrix, 3, 0, False)
+    #results, stream = detector.atDetectTags(stream, camMatrix, camdistortion, 3, 0, False)
 
     # Display the capture
     cv.imshow("Stream", stream)

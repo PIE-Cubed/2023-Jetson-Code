@@ -6,8 +6,8 @@ import glob
 import cv2   as cv
 import numpy as np
 
-# Defining the dimensions of CHESSBOARD
-CHESSBOARD = (8, 8)  # Number of sqares (width x height)
+# Defining the dimensions of the chessboard
+CHESSBOARD = (7, 7)  # Number of interior corners (width x height)
 
 # Default termination criteria
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -89,8 +89,9 @@ class Calibrate:
                 img = cv.drawChessboardCorners(img, CHESSBOARD, corners2, ret)
 
             # Display the image and wait for one second
-            cv.imshow("img", img)
-            cv.waitKey(1000)
+            if ((ret == True) & (refExists == False)):
+                cv.imshow("img", img)
+                cv.waitKey(1000)
 
         # Destroys all cached windows
         cv.destroyAllWindows()
@@ -134,9 +135,6 @@ class Calibrate:
             while (imgSelected == False):
                 # Read the capture
                 sucess, stream = self.cap.read()
-            
-                # Flips the image
-                cv.flip(stream, 1)
 
                 # Converts images to grayscale
                 gray = cv.cvtColor(stream, cv.COLOR_BGR2GRAY)
