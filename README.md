@@ -12,12 +12,12 @@
 <p>
 	<ul>
 		<li>A <a href="https://www.python.org/downloads/">Python 3</a> environment (prefereably <a href="https://www.python.org/downloads/release/python-3108/">3.10.8</a>)</li>
-		<li>The <a href="https://pypi.org/project/opencv-contrib-python/">OpenCV Contributor</a> module</li>
-		<li>The <a href="https://pypi.org/project/numpy/">NumPy</a> module (should install with OpenCV)</li>
-		<li>The <a href="https://pypi.org/project/robotpy/">RobotPy</a> module</li>
-		<li>The <a href="https://pypi.org/project/transforms3d/">Transforms3d</a> module</li>
-		<li>The <a href="https://github.com/AprilRobotics/apriltag">Official AprilTags</a> module</li>
-		<li>The <a href="https://pypi.org/project/dt-apriltags/">Duckie Town Apriltags</a> module</li>
+		<li>The <a href="https://pypi.org/project/opencv-contrib-python/">OpenCV Contributor</a> package</li>
+		<li>The <a href="https://pypi.org/project/numpy/">NumPy</a> package (should install with OpenCV)</li>
+		<li>The <a href="https://pypi.org/project/robotpy/">RobotPy</a> package</li>
+		<li>The <a href="https://pypi.org/project/transforms3d/">Transforms3d</a> package</li>
+		<li>The <a href="https://github.com/AprilRobotics/apriltag">Official AprilTags</a> package</li>
+		<li>The <a href="https://pypi.org/project/dt-apriltags/">Duckie Town Apriltags</a> package</li>
 	</ul>
 </p>
 
@@ -29,7 +29,7 @@
 	$ sh InstallPrerequisites.sh
 </p>
 <p>
-	AFTER running the script, it will prompt you for a root password. DO NOT enter the root password BEFORE running the above command as it breaks a lot of the module dependencies.
+	<strong>Please Note: DO NOT run the above command with root provledges as that will cause pip and git will install their packages to an incorrect location and break other package dependencies.</strong>
 </p>
 <p>
 	&nbsp
