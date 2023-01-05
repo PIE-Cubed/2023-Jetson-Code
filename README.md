@@ -23,10 +23,13 @@
 
 <h2> Installation of Prerequisites </h2>
 <p>
-	If on Linux, open a terminal and navigate to this directiory. Once here run, run InstallPrerequisites.sh with this command:
-	```
-	sudo sh InstallPrerequisites.sh
-	```
+	If on Linux, download InstallPrerequisites.sh.
+	Once downloaded, open a terminal and tun this command:
+	
+	$ sh InstallPrerequisites.sh
+</p>
+<p>
+	AFTER running the script, it will prompt you for a root password. DO NOT enter the root password BEFORE running the above command as it breaks a lot of the module dependencies.
 </p>
 <p>
 	&nbsp
