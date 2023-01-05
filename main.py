@@ -30,6 +30,9 @@ while (cap.isOpened() == True):
     results, stream = detector.detectTags(stream, camMatrix, 3, 0, False)
     #results, stream = detector.atDetectTags(stream, camMatrix, camdistortion, 3, 0, False)
 
+    # Flips the stream for easier viewing
+    stream = cv.flip(stream, 1)
+
     # Display the capture
     cv.imshow("Stream", stream)
  

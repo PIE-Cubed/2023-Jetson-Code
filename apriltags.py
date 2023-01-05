@@ -9,6 +9,7 @@ from apriltag import apriltag
 
 # Import Classes
 from Units               import Units
+from Logger              import Logger
 from AprilTag            import AprilTag
 from AprilTagFieldLayout import AprilTagFieldLayout
 from communications      import NetworkCommunications
@@ -31,7 +32,10 @@ class Detector:
 
         # Creates an apriltag detector
         self.atdetector = apriltag("tag16h5")
-        self.dtdetector = dt_apriltags.Detector(families = "tag16h5", nthreads = 8, quad_decimate = 1.0, quad_sigma = 0.0, refine_edges = 1, decode_sharpening = 0.25)
+        self.dtdetector = dt_apriltags.Detector(families = "tag16h5", nthreads = 8, quad_decimate = 1.0, quad_sigma = 0.5, refine_edges = 2.0, decode_sharpening = 1.00)
+
+        # Update logs
+        Logger.logInfo("Detectors initialized")
 
     def detectTags(self, stream, camera_matrix, vizualization = 0, verbose = 0, annotate = False):
         """
@@ -66,10 +70,21 @@ class Detector:
         # Access the 3D pose of all detected tag
         for i, tag in enumerate(detections):
             # Gets info from the tag
-            tag_num = tag.tag_id
+            decision_margin = tag.decision_margin
+            hamming         = tag.hamming
+            tag_num         = tag.tag_id
+            center          = tag.center
+
+            # Gets pose data from the tag
             rMatrix = tag.pose_R
             tVecs   = tag.pose_t
             err     = tag.pose_err
+
+            homography = tag.homography
+            corners = tag.corners
+
+            # Updates log
+            Logger.logDebug("Tag Id: {}, Decision Margin: {}, Error: {}, Hamming: {}, Homography: {}".format(tag_num, decision_margin, err, hamming, homography))
 
             # Creates a 3d pose array from the rotation matrix and translation vectors
             pose = np.concatenate([rMatrix, tVecs], axis = 1)
@@ -83,10 +98,10 @@ class Detector:
             if (vizualization == 1):
                 self.draw_pose_box(stream, camera_matrix, pose)
             elif (vizualization == 2):
-                self.draw_pose_axes(stream, camera_matrix, pose, tag.center)
+                self.draw_pose_axes(stream, camera_matrix, pose, center)
             elif (vizualization == 3):
                 self.draw_pose_box(stream, camera_matrix, pose)
-                self.draw_pose_axes(stream, camera_matrix, pose, tag.center)
+                self.draw_pose_axes(stream, camera_matrix, pose, center)
 
             # Annotates the image
             if (annotate == True):
@@ -99,8 +114,11 @@ class Detector:
             # Calculate Euler's Angles
             euler_angles = self.calculateEulerAngles(pose[:3, :3])
 
-            # Adds results to the array
-            results.extend([tag_num, err, pose, euler_angles])
+            # Adds results to the array if the hamming id's match
+            if (hamming == 5):
+                results.extend([tag_num, err, pose, euler_angles])
+            else:
+                results.extend([tag_num, err, [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], [0, 0, 0]])
 
             print("Tag", tag_num, "Rotation Matrix: \n", pose[:3, :3])
             print("Tag", tag_num, "Transformation Vectors: \n", pose[:3, 3:])
@@ -330,18 +348,16 @@ class Detector:
         cv.line(img, center, tuple(ipoints[1].ravel()), (0,255,0), 2)
         cv.line(img, center, tuple(ipoints[2].ravel()), (255,0,0), 2)
     
-    def draw(self, img, corners, imgpts):
-        imgpts = np.int32(imgpts).reshape(-1,2)
-
+    def draw(self, img, corners):
         # draw ground floor in green
-        img = cv.drawContours(img, [imgpts[:4]],-1,(0,255,0),-3)
+        img = cv.drawContours(img, [corners[:4]], -1, (0, 255, 0), -3)
 
         # draw pillars in blue color
-        for i,j in zip(range(4),range(4,8)):
-            img = cv.line(img, tuple(imgpts[i]), tuple(imgpts[j]),(255),3)
+        for i, j in zip(range(4), range(4, 8)):
+            img = cv.line(img, tuple(corners[i]), tuple(corners[j]), (255), 3)
 
         # draw top layer in red color
-        img = cv.drawContours(img, [imgpts[4:]],-1,(0,0,255),3)
+        img = cv.drawContours(img, [corners[4:]], -1, (0, 0, 255), 3)
 
         return img
 

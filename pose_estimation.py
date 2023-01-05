@@ -9,6 +9,7 @@ from wpimath._controls._controls.controller import PIDController
 
 # Import Classes
 from Units          import Units
+from Logger         import Logger
 from communications import NetworkCommunications
 
 # Robot dimensions measured from the center of each wheel (inches)

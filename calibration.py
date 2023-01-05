@@ -6,8 +6,11 @@ import glob
 import cv2   as cv
 import numpy as np
 
-# Defining the dimensions of the chessboard
-CHESSBOARD = (7, 7)  # Number of interior corners (width x height)
+# Import Classes
+from Logger import Logger
+
+# Defines the dimensions of the chessboard
+CHESSBOARD = (7, 7)  # Number of interior corners (width in squares - 1 x height in squares - 1)
 
 # Default termination criteria
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -90,6 +93,10 @@ class Calibrate:
 
             # Display the image and wait for one second
             if ((ret == True) & (refExists == False)):
+                # Flips the image for easier viewing
+                img = cv.flip(img, 1)
+
+                # Displays image
                 cv.imshow("img", img)
                 cv.waitKey(1000)
 
@@ -109,6 +116,9 @@ class Calibrate:
         # Prints the reprediction error
         repredictError = self.calculateRepredictionError()
         print("\nCamera {} Total error: {}".format(self.camNum, repredictError) )
+
+        # Update the log
+        Logger.logInfo("Camera {} calibrated".format(self.camNum))
 
         # Return calibration results
         return self.ret, self.cameraMatrix, self.distortion, self.rvecs, self.tvecs
@@ -149,10 +159,13 @@ class Calibrate:
 
                     # Draw the corners onto the stream
                     stream = cv.drawChessboardCorners(stream, CHESSBOARD, corners2, ret)
-            
+
+                # Flip the capture for display purposes
+                flippedStream = cv.flip(stream, 1)
+
                 # Display the capture
-                cv.imshow("Callibration", stream)
-            
+                cv.imshow("Callibration", flippedStream)
+
                 # Press p to take a calibration image
                 if ( cv.waitKey(1) == ord("p") ):
                     # Writes the image
@@ -167,6 +180,10 @@ class Calibrate:
 
         # Destroys all windows
         cv.destroyAllWindows()
+
+        # Updates log
+        Logger.logInfo("Calibration images generated")
+        Logger.logInfo("Images stored at " +  self.PATH)
 
     def getPathExistance(self) -> bool:
         """
@@ -186,12 +203,15 @@ class Calibrate:
         # Attempts to read the last callibration image and updates variables accordingly
         img = cv.imread(self.PATH + "15" + self.EXTENSION)
 
+        # Determines if the calibration imgaes exist
         if img is not None:
             pathExists = True
-            print("Path already exists")
+            Logger.logInfo("PATH exists")
+            print("PATH already exists")
         else:
             pathExists = False
-            print("Path does not exist")
+            Logger.logWarning("PATH does not exist")
+            print("PATH does not exist")
  
         return pathExists
 
@@ -200,13 +220,19 @@ class Calibrate:
         Calulates the reprediction error
         """
         # Reprediction error
-        mean_error = 0
+        total_error = 0
 
         # Loops through object points
         for i in range(len(self.objPoints)):
             imgPoints2, _ = cv.projectPoints(self.objPoints[i], self.rvecs[i], self.tvecs[i], self.cameraMatrix, self.distortion)
             error = cv.norm(self.imgPoints[i], imgPoints2, cv.NORM_L2) / len(imgPoints2)
-            mean_error += error
+            total_error += error
 
-        # Prints the total error
-        return mean_error / len(self.objPoints)
+        # Calculates mean error from the total
+        mean_error = total_error / len(self.objPoints)
+
+        # Updates log
+        Logger.logDebug("Reprediction error: {}".format(mean_error))
+
+        # Returns the mean error
+        return mean_error

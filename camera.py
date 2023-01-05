@@ -4,6 +4,7 @@
 import cv2 as cv
 
 # Import Classes
+from Logger      import Logger
 from calibration import Calibrate
 
 # CONSTANTS
@@ -49,6 +50,9 @@ class USBCamera:
         # Prints telemetry
         print("Max Resolution:", str(self.width) + "x" + str(self.height))
         print("Max FPS:", self.fps)
+
+        # Updates log
+        Logger.logInfo("Capture resized")
 
         return self.cap
 

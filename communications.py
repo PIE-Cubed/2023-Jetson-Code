@@ -2,6 +2,7 @@
 
 # Import Libraries
 import numpy as np
+from   Logger import Logger
 from   networktables import *
 from   wpimath.kinematics._kinematics import SwerveModulePosition
 
