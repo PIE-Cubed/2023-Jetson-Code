@@ -16,18 +16,24 @@ sudo apt-get install -y git python3-pip cmake ninja-build libopencv-dev
 pip install opencv-contrib-python robotpy transforms3d dt-apriltags
 
 # Installs all submodules of robot py
-pip install robotpy[all]
+# pip install robotpy[all]
 
-# Install camera server
+# Installs the camera server
 robotpy_installer install robotpy-cscore
+
+# Move to the documents directory
+cd Documents
+
+# Clone the Jetson Code
+git clone https://github.com/PIE-Cubed/2023-Jetson-Code
 
 # Back out to the home directory
 cd
 
-# Clone the AprilTags library
+# Clone the AprilTags repository
 git clone https://www.github.com/AprilRobotics/apriltag
 
-# Enter the apriltag directory
+# Moves to the apriltag directory
 cd apriltag
 
 # Make the build files
