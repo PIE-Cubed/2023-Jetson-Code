@@ -46,6 +46,9 @@ class Calibrate:
         # File extension
         self.EXTENSION = ".png"
 
+        # Variables
+        self.doOver = False
+
     def calibrateCamera(self):
         """
         Calibrates the given camera at a certain resolution
@@ -57,12 +60,13 @@ class Calibrate:
         """
         # Variable to see how many images were used in the calibration
         imagesUsed = 0
+        self.doOver == False
 
         # Checks if reference images exist
         refExists = self.getPathExistance()
 
-        # If reference images for this resolution do not exist or are corrupt, create them
-        if (refExists == True):
+        # If reference images for this resolution do not exist or do not contain sufficient data, create them
+        if (refExists == True | self.doOver == False):
             pass
         else:
             self.createCalibrationImages()
@@ -114,8 +118,13 @@ class Calibrate:
         if (imagesUsed <= (self.calibrationImages * 2/3)):
             # Updates log
             Logger.logWarning("Calibration restarted")
- 
+
+            # Sets up for a do over
+            self.doOver = True
+
             self.calibrateCamera()
+        else:
+            self.doOver = False
 
         # Calibrate the camera by passing the value of known 3D points (objPoints) and corresponding pixel coordinates of the detected corners (imgPoints)
         self.ret, self.cameraMatrix, self.distortion, self.rvecs, self.tvecs = cv.calibrateCamera(self.objPoints, self.imgPoints, gray.shape[::-1], None, None)
