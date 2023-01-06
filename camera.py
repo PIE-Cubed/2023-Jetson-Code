@@ -66,7 +66,7 @@ class USBCamera:
         @return translationVectors
         """
         # Instance creation
-        self.calibrate = Calibrate(cap, self.camNum)
+        self.calibrate = Calibrate(cap, self.camNum, 15)
 
         # Return results
         return self.calibrate.calibrateCamera()

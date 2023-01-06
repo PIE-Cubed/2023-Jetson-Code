@@ -17,15 +17,16 @@ criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 # Creates the Calibrate class
 class Calibrate:
-    def __init__(self, cap, camNum: int) -> None:
+    def __init__(self, cap, camNum: int, images = 15) -> None:
         """
         Constructor for the Calibrate class.
         @param VideoCapture
         @param Camera Number
         """
         # Localizes parameters
-        self.cap    = cap
-        self.camNum = camNum
+        self.cap               = cap
+        self.camNum            = camNum
+        self.calibrationImages = images
 
         # Get height and width
         self.width  = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH))
@@ -54,6 +55,9 @@ class Calibrate:
         @return rotationVectors
         @return translationVectors
         """
+        # Variable to see how many images were used in the calibration
+        imagesUsed = 0
+
         # Checks if reference images exist
         refExists = self.getPathExistance()
 
@@ -91,6 +95,9 @@ class Calibrate:
                 # Draw the corners onto the image
                 img = cv.drawChessboardCorners(img, CHESSBOARD, corners2, ret)
 
+                # Increments the imagesUsed count
+                imagesUsed += 1
+
             # Display the image and wait for one second
             if ((ret == True) & (refExists == False)):
                 # Flips the image for easier viewing
@@ -102,6 +109,13 @@ class Calibrate:
 
         # Destroys all cached windows
         cv.destroyAllWindows()
+
+        # Restarts the calibration if 2/3 of the images cannot be used for calibration
+        if (imagesUsed <= (self.calibrationImages * 2/3)):
+            # Updates log
+            Logger.logWarning("Calibration restarted")
+ 
+            self.calibrateCamera()
 
         # Calibrate the camera by passing the value of known 3D points (objPoints) and corresponding pixel coordinates of the detected corners (imgPoints)
         self.ret, self.cameraMatrix, self.distortion, self.rvecs, self.tvecs = cv.calibrateCamera(self.objPoints, self.imgPoints, gray.shape[::-1], None, None)
@@ -131,7 +145,7 @@ class Calibrate:
         imgSelected = False
  
         # Create
-        for i in range(0, 15):
+        for i in range(0, self.calibrationImages):
             # Seperates the enumeration from the naming
             j = i + 1
 
@@ -201,7 +215,7 @@ class Calibrate:
             pass
 
         # Attempts to read the last callibration image and updates variables accordingly
-        img = cv.imread(self.PATH + "15" + self.EXTENSION)
+        img = cv.imread(self.PATH + "{}".format(self.calibrationImages) + self.EXTENSION)
 
         # Determines if the calibration imgaes exist
         if img is not None:
