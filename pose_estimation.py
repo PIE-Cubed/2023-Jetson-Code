@@ -70,36 +70,6 @@ class PoseEstimator:
             visionTrust
         )
 
-    def resetPoseTrackers(self, pose: Pose2d):
-        """
-        Resets both pose trackers to a certian pose
-        @param pose: Pose2d
-        """
-        self.resetOdometry(pose)
-        self.resetPoseEstimator(pose)
-
-    def resetOdometry(self, pose: Pose2d):
-        """
-        Resets the SwerveOdometry to a pose.
-        @param pose: Pose2d
-        """
-        # Gets the module positions
-        allPositiions = self.getAllModulePositions()
-
-        # Resets the SwerveOdometry
-        self.odometry.resetPosition(self.generateRot2d(), pose, allPositiions[0], allPositiions[1], allPositiions[2], allPositiions[3])
-
-    def resetPoseEstimator(self, pose: Pose2d):
-        """
-        Resets the SwervePoseEstimator to a pose.
-        @param pose: Pose2d
-        """
-        # Gets the module positions
-        allPositiions = self.getAllModulePositions()
-
-        # Resets the SwerveOdometry
-        self.odometry.resetPosition(self.generateRot2d(), pose, allPositiions[0], allPositiions[1], allPositiions[2], allPositiions[3])
-
     def updatePoseTrackers(self):
         """
         Updates both pose trackers.
@@ -146,21 +116,35 @@ class PoseEstimator:
                 detPose.toPose2d(),
                 detTime)
 
-    def getAllModulePositions(self):
+    def resetPoseTrackers(self, pose: Pose2d):
         """
-        Gets all the swerve module positions.
-        @return 
+        Resets both pose trackers to a certian pose
+        @param pose: Pose2d
         """
-        # Creates an array of zeros with a length of 4
-        allPositions = [0] * 4
+        self.resetOdometry(pose)
+        self.resetPoseEstimator(pose)
 
-        # Sets all the positions acordingly
-        allPositions[0] = self.comms.getFLPosition()
-        allPositions[1] = self.comms.getRLPosition()
-        allPositions[2] = self.comms.getFRPosition()
-        allPositions[3] = self.comms.getRRPosition()
+    def resetOdometry(self, pose: Pose2d):
+        """
+        Resets the SwerveOdometry to a pose.
+        @param pose: Pose2d
+        """
+        # Gets the module positions
+        allPositiions = self.getAllModulePositions()
 
-        return allPositions
+        # Resets the SwerveOdometry
+        self.odometry.resetPosition(self.generateRot2d(), pose, allPositiions[0], allPositiions[1], allPositiions[2], allPositiions[3])
+
+    def resetPoseEstimator(self, pose: Pose2d):
+        """
+        Resets the SwervePoseEstimator to a pose.
+        @param pose: Pose2d
+        """
+        # Gets the module positions
+        allPositiions = self.getAllModulePositions()
+
+        # Resets the SwerveOdometry
+        self.odometry.resetPosition(self.generateRot2d(), pose, allPositiions[0], allPositiions[1], allPositiions[2], allPositiions[3])
 
     def getBestResult(self, results):
         """
@@ -199,6 +183,22 @@ class PoseEstimator:
         self.comms.sendBestResult(results[bestResult])
 
         return Pose3d(Translation3d(x, y, z), Rotation3d(roll, pitch, yaw))
+
+    def getAllModulePositions(self):
+        """
+        Gets all the swerve module positions.
+        @return 
+        """
+        # Creates an array of zeros with a length of 4
+        allPositions = [0] * 4
+
+        # Sets all the positions acordingly
+        allPositions[0] = self.comms.getFLPosition()
+        allPositions[1] = self.comms.getRLPosition()
+        allPositions[2] = self.comms.getFRPosition()
+        allPositions[3] = self.comms.getRRPosition()
+
+        return allPositions
 
     def getHeading(self):
         """

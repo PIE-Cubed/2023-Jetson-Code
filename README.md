@@ -3,10 +3,14 @@
 	A repository that contains code to will run on FRC 2199's Nvidia Jetson coprocessor during the 2023 season.
 </p>
 
+</br>
+
 <h2> Setting Up the Jetson </h2>
 <p>
-	Not yet completed...
+	Please see the instructions <a href="https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit">here</a> for setting up an Nvidia Jetson.
 </p>
+
+</br>
 
 <h2> Prerequisites </h2>
 <p>
@@ -21,29 +25,39 @@
 	</ul>
 </p>
 
-<h2> Installation of Prerequisites </h2>
+</br>
+
+<h2> Installation </h2>
+<h3> If on Linux: </h3>
 <p>
-	If on Linux, download InstallPrerequisites.sh.
-	Once downloaded, open a terminal and tun this command:
+	Download <a href="">Install.sh</a> and run it from the terminal using this command: 
 	
-	$ sh InstallPrerequisites.sh
+	$ sh Install.sh
 </p>
 <p>
-	<strong>Please Note: DO NOT run the above command with root provledges as that will cause pip and git will install their packages to an incorrect location and break other package dependencies.</strong>
+	<strong>Note: DO NOT run the above command with root provledges as that will cause pip and git will install their packages to an incorrect location and break other package dependencies.</strong>
 </p>
+</br>
+<h3>If on Windows:</h3>
 <p>
-	&nbsp
-</p>
-<p>
-	If not on Linux:
 	<ul>
-		<li>Follow the instructions at the Python 3 link to install Python 3 for your operating system.</li>
-		<li>Install OpenCV Contributor, RobotPy, and Transforms3d with their respective pip commands.</li>
+		<li>Follow the instructions at the Python 3 link to install Python 3 for Windows.</li>
+		<li>Install Ubuntu 20.04 (or greater) in Windows Subsystem for Linux (WSL) with <a href="https://learn.microsoft.com/en-us/windows/wsl/install">these</a> instructions.</li>
+		<li>Install OpenCV Contributor, RobotPy, and Transforms3d in the subsytem with their respective pip commands.</li>
 	</ul>
-	<strong>Please Note: The AprilTag detector we use is Linux exclusive and WILL NOT run on any other OS.</strong>
+	<strong>Note: WSL installs a version of Linux that is strictly command based and currently has issues with using attached webcams.</strong>
 </p>
+
+</br>
 
 <h2> Writing Programs for Jetson </h2>
 <p>
-	Not yet completed...
+	This is addressed in detail in the <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/wiki">wiki</a>.
+</p>
+
+</br>
+
+<h2> More details </h2>
+<p>
+	All of these sections (and more!) will be explained farther in the <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/wiki">wiki</a>.
 </p>
