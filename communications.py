@@ -24,17 +24,16 @@ class NetworkCommunications:
 
         # Create a RobotData table and its entries
         RobotData = ntinst.getTable("RobotData")
-        self.gyroYaw        = RobotData.getEntry("GyroYaw")     # Double
-        self.currentTimeSec = RobotData.getEntry("CurrentTime") # Double
-        self.detectTime     = RobotData.getEntry("DetectTime")  # Double
-        self.FLRot          = RobotData.getEntry("FLRotation")  # Double
-        self.RLRot          = RobotData.getEntry("RLRotation")  # Double
-        self.FRRot          = RobotData.getEntry("FRRotation")  # Double
-        self.RRRot          = RobotData.getEntry("RRRotation")  # Double
-        self.FLVel          = RobotData.getEntry("FLVelocity")  # Double
-        self.RLVel          = RobotData.getEntry("RLVelocity")  # Double
-        self.FRVel          = RobotData.getEntry("FRVelocity")  # Double
-        self.RRVel          = RobotData.getEntry("RRVelocity")  # Double
+        self.gyroYaw    = RobotData.getEntry("GyroYaw")     # Double
+        self.detectTime = RobotData.getEntry("DetectTime")  # Double
+        self.FLRot      = RobotData.getEntry("FLRotation")  # Double
+        self.RLRot      = RobotData.getEntry("RLRotation")  # Double
+        self.FRRot      = RobotData.getEntry("FRRotation")  # Double
+        self.RRRot      = RobotData.getEntry("RRRotation")  # Double
+        self.FLVel      = RobotData.getEntry("FLVelocity")  # Double
+        self.RLVel      = RobotData.getEntry("RLVelocity")  # Double
+        self.FRVel      = RobotData.getEntry("FRVelocity")  # Double
+        self.RRVel      = RobotData.getEntry("RRVelocity")  # Double
 
         # Create a TagInfo Table and its Entries
         TagInfo = ntinst.getTable("TagInfo")
@@ -67,10 +66,17 @@ class NetworkCommunications:
         pitch, yaw, roll = flatAngles[3], flatAngles[7], flatAngles[11]
 
         # Packs all the data
-        data = (tagId, x, y, z, roll, pitch, yaw)
+        data = (tagId, error, x, y, z, roll, pitch, yaw)
 
         # Sends the data
         self.bestResult.setDoubleArray(data)
+
+    def sendDetectTimeSec(self, timeSec):
+        """
+        Send the time when a detection was made.
+        @param timeSec
+        """
+        self.detectTime.setDouble(timeSec)
 
     def getFLPosition(self):
         """
@@ -102,17 +108,3 @@ class NetworkCommunications:
 
     def getGyroYaw(self):
         return self.gyroYaw.getDouble(1000.00)
-
-    def getTimeSec(self):
-        """
-        Gets the current time in seconds as the RIO calculated it.
-        @return currentTime: Default value is -1.00
-        """
-        return self.currentTimeSec.getDouble(-1.00)
-
-    def sendDetectTimeSec(self, timeSec):
-        """
-        Send the time when a detection was made.
-        @param timeSec
-        """
-        self.detectTime.setDouble(timeSec)

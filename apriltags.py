@@ -5,6 +5,7 @@ import cv2   as cv
 import numpy as np
 import transforms3d
 import dt_apriltags
+from wpilib import Timer
 from apriltag import apriltag
 
 # Import Classes
@@ -27,8 +28,9 @@ class Detector:
         allTags = self.createAllTags()
 
         # Instance creation
-        self.field  = AprilTagFieldLayout(allTags, 2, 2, False)
         self.commms = NetworkCommunications()
+        self.field  = AprilTagFieldLayout(allTags, 2, 2, False)
+        self.timer  = Timer()
 
         # Creates an apriltag detector
         self.atdetector = apriltag("tag16h5")
@@ -126,7 +128,7 @@ class Detector:
             print("Tag", tag_num, "Euler Angles: \n", euler_angles)
         
         # Gets current time
-        time = self.commms.getTimeSec()
+        time = self.timer.getFPGATimestamp()
 
         # Sets detection time
         self.commms.sendDetectTimeSec(time)
@@ -213,7 +215,7 @@ class Detector:
             print("Tag", tag_num, "Euler Angles: \n", euler_angles)
 
         # Gets current time
-        time = self.commms.getTimeSec()
+        time = self.timer.getFPGATimestamp()
 
         # Sets detection time
         self.commms.sendDetectTimeSec(time)
