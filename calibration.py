@@ -49,6 +49,9 @@ class Calibrate:
         # Variables
         self.doOver = False
 
+        # Updates log
+        Logger.logInfo("Calibrate initialized")
+
     def calibrateCamera(self):
         """
         Calibrates the given camera at a certain resolution

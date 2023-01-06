@@ -26,6 +26,9 @@ class USBCamera:
         self.height = -1
         self.fps    = -1
 
+        # Updates log
+        Logger.logInfo("USBCamera initialized")
+
     def autoResize(self):
         """
         Autmatically resizes the capture to the highest resolution.

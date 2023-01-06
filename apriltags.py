@@ -37,7 +37,7 @@ class Detector:
         self.dtdetector = dt_apriltags.Detector(families = "tag16h5", nthreads = 8, quad_decimate = 1.0, quad_sigma = 0.5, refine_edges = 2.0, decode_sharpening = 1.00)
 
         # Update logs
-        Logger.logInfo("Detectors initialized")
+        Logger.logInfo("Detector initialized")
 
     def detectTags(self, stream, camera_matrix, vizualization = 0, verbose = 0, annotate = False):
         """

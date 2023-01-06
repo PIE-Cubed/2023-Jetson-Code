@@ -70,6 +70,9 @@ class PoseEstimator:
             visionTrust
         )
 
+        # Updates log
+        Logger.logInfo("PoseEstimator initialized")
+
     def updatePoseTrackers(self):
         """
         Updates both pose trackers.

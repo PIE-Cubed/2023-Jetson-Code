@@ -39,6 +39,9 @@ class NetworkCommunications:
         TagInfo = ntinst.getTable("TagInfo")
         self.bestResult = TagInfo.getEntry("BestResult")  # Double[]
 
+        # Updates log
+        Logger.logInfo("NetworkCommunications initialized")
+
     def sendBestResult(self, result):
         """
         Sends the result with the least erro.
