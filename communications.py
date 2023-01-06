@@ -38,13 +38,13 @@ class NetworkCommunications:
 
         # Create a TagInfo Table and its Entries
         TagInfo = ntinst.getTable("TagInfo")
-        self.bestResult          = TagInfo.getEntry("")  # Double[]
+        self.bestResult = TagInfo.getEntry("BestResult")  # Double[]
 
     def sendBestResult(self, result):
         """
         Sends the result with the least erro.
 
-        This method will send [tagId, error, xTranslate, yTranslate, zTranslate, yaw, pitch, roll].
+        This method will send [tagId, xTranslate, yTranslate, zTranslate, yaw, pitch, roll].
         All translation data is in meters. All rotation data is in radians.
         @param result
         """
@@ -67,7 +67,7 @@ class NetworkCommunications:
         pitch, yaw, roll = flatAngles[3], flatAngles[7], flatAngles[11]
 
         # Packs all the data
-        data = (tagId, error, x, y, z, roll, pitch, yaw)
+        data = (tagId, x, y, z, roll, pitch, yaw)
 
         # Sends the data
         self.bestResult.setDoubleArray(data)
