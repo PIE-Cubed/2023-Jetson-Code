@@ -135,23 +135,19 @@ class Calibrate:
         self.ret, self.cameraMatrix, self.distortion, self.rVecs, self.tVecs = cv.calibrateCamera(self.objPoints, self.imgPoints, gray.shape[::-1], None, None)
 
         # Print calibration reults
-        print("Camera {} calibrated: ".format(self.camNum), self.ret)
+        print("Camera {} Calibrated: ".format(self.camNum), self.ret)
         print("\nCamera Matrix:\n", self.cameraMatrix)
-        print("\nDistortion matrix:\n", self.distortion)
+        print("\nDistortion Matrix:\n", self.distortion)
         print("\nCamera rVecs:\n", self.rVecs)
         print("\nCamera tVecs:\n", self.tVecs)
 
         # Prints the reprediction error
         repredictError = self.calculateRepredictionError()
-        print("\nCamera average reprediction error: {}".format(repredictError) )
+        print("\nAverage Reprediction Error: {}".format(repredictError) )
 
         # Updates log
-        Logger.logInfo("Camera {} calibrated".format(self.camNum))
-        Logger.logInfo("Camera Matrix: {}".format(self.cameraMatrix))
-        Logger.logInfo("Camera Distortion: {}".format(self.distortion))
-        Logger.logInfo("Rotation Vectors: {}".format(self.rVecs))
-        Logger.logInfo("Translation Vectors: {}".format(self.tVecs))
-        Logger.logInfo("Average Reprediction Error: {}".format(repredictError))
+        Logger.logInfo("Camera {} Calibrated".format(self.camNum))
+        Logger.logInfo("Camera Matrix: \n{}, \nDistortion Matrix: \n{}, \nRotation Vectors: \n{}, \nTranslation Vectors: \n{}, \nAverage Reprediction Error: {}".format(self.cameraMatrix, self.distortion, self.rVecs, self.tVecs. repredictError))
 
         # Return calibration results
         return self.ret, self.cameraMatrix, self.distortion, self.rVecs, self.tVecs
