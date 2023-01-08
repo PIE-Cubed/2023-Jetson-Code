@@ -4,7 +4,7 @@
 import cv2   as cv
 import numpy as np
 import transforms3d
-import dt_apriltags
+import pupil_apriltags
 from wpilib import Timer
 
 # Import Classes
@@ -31,8 +31,8 @@ class Detector:
         self.field  = AprilTagFieldLayout(allTags, 2, 2, False)
         self.timer  = Timer()
 
-        # Creates an apriltag detector
-        self.dtdetector = dt_apriltags.Detector(families = "tag16h5", nthreads = 16, quad_decimate = 1.0, quad_sigma = 0.0, refine_edges = 2.0, decode_sharpening = 1.00)
+        # Creates a pupil apriltags detector
+        self.detector = pupil_apriltags.Detector(families = "tag16h5", nthreads = 16, quad_decimate = 1.0, quad_sigma = 0.0, refine_edges = 2.0, decode_sharpening = 1.00)
 
         # Update logs
         Logger.logInfo("Detector initialized")
@@ -57,7 +57,7 @@ class Detector:
         intrinsic_properties = (camera_matrix[0, 0], camera_matrix[1, 1], camera_matrix[0, 2], camera_matrix[1, 2])  # fx, fy, cx, cy
 
         # Detect the AprilTags in the image with Duckie Town Apriltags
-        detections = self.dtdetector.detect(gray, estimate_tag_pose = True, camera_params = intrinsic_properties, tag_size = tagSize)
+        detections = self.detector.detect(gray, estimate_tag_pose = True, camera_params = intrinsic_properties, tag_size = tagSize)
 
         # If verbose enabled, prints number of tags detected
         num_detections = len(detections)
@@ -119,8 +119,8 @@ class Detector:
             results.extend([tag_num, err, pose, euler_angles])
 
             # Updates log
-            Logger.logInfo("Tag: {}, \nrMatrix: \n{}, \ntVecs: \n{}, \nPose3d: \n{}, \nEuler Angles: \n{}".format(tag_num, pose[:3, :3], pose[:3, 3:], pose, euler_angles))
-        
+            Logger.logInfo("Tag: {}, \nrMatrix: \n{}, \ntVecs: \n{}, \nEuler Angles: \n{}, \nPose3d: \n{}".format(tag_num, pose[:3, :3], pose[:3, 3:], euler_angles, pose))
+
         # Gets current time
         time = self.timer.getFPGATimestamp()
 

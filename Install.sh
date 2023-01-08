@@ -15,13 +15,10 @@ sudo apt-get install -y python3.10
 # Install git, python3-pip, cmake, ninja, and opencv (c++)
 sudo apt-get install -y git python3-pip cmake ninja-build libopencv-dev
 
-# Install all needed pip libraries
-pip install opencv-contrib-python robotpy transforms3d dt-apriltags
+# Installs the required pip libraries
+pip install opencv-contrib-python robotpy transforms3d pupil-apriltags dt-apriltags
 
-# Installs all submodules of robot py
-# pip install robotpy[all]
-
-# Installs the camera server
+# Installs the python camera server
 robotpy_installer install robotpy-cscore
 
 # Move to the documents directory

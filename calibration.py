@@ -147,7 +147,7 @@ class Calibrate:
 
         # Updates log
         Logger.logInfo("Camera {} Calibrated".format(self.camNum))
-        Logger.logInfo("Camera Matrix: \n{}, \nDistortion Matrix: \n{}, \nRotation Vectors: \n{}, \nTranslation Vectors: \n{}, \nAverage Reprediction Error: {}".format(self.cameraMatrix, self.distortion, self.rVecs, self.tVecs. repredictError))
+        Logger.logInfo("Camera Matrix: \n{}, \nDistortion Matrix: \n{}, \nRotation Vectors: \n{}, \nTranslation Vectors: \n{}, \nAverage Reprediction Value: {}".format(self.cameraMatrix, self.distortion, self.rVecs, self.tVecs, repredictError))
 
         # Return calibration results
         return self.ret, self.cameraMatrix, self.distortion, self.rVecs, self.tVecs
