@@ -242,7 +242,8 @@ class Detector:
         # Calculate object points of each AprilTag
         opoints = np.float32([[1, 0, 0],
                               [0, -1, 0],
-                              [0, 0, -1]]).reshape(-1, 3) * tagSize
+                              [0, 0, -1]
+                              ]).reshape(-1, 3) * tagSize
 
         # Calulate image points of each AprilTag
         ipoints, _ = cv.projectPoints(opoints, rVecs, tVecs, camera_matrix, dcoeffs)
@@ -283,7 +284,7 @@ class Detector:
 
         # Writes the text to the image
         cv.putText(img, text, (text_x, text_y), font, font_size, (0, 255, 255), 2)
-    
+
     def createAllTags(self):
         """
         Creates all known AprilTags.
