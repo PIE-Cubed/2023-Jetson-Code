@@ -125,8 +125,8 @@ class Detector:
 			results.extend([tag_num, err, pose, euler_angles])
 
 			# Updates log
-			# Logger.logInfo("Tag: {}, \nrMatrix: \n{}, \ntVecs: \n{}, \nEuler Angles: \n{}, \nPose3d: \n{}".format(tag_num, pose[:3, :3], pose[:3, 3:], euler_angles, pose))
-			Logger.logDebug("Tag: {}, \nErr: {}, \nMargin: {}, \nHamming: {}".format(tag_num, err, decision_margin, hamming))
+			Logger.logInfo("Tag: {}, \nrMatrix: \n{}, \ntVecs: \n{}, \nEuler Angles: \n{}, \nPose3d: \n{}".format(tag_num, pose[:3, :3], pose[:3, 3:], euler_angles, pose))
+			#Logger.logDebug("Tag: {}, \nErr: {}, \nMargin: {}, \nHamming: {}".format(tag_num, err, decision_margin, hamming))
 
 		# Gets current time
 		time = self.timer.getFPGATimestamp()
