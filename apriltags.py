@@ -66,8 +66,9 @@ class Detector:
 
 		# Creates variables to use in detections
 		results = []
-		maxError = 1e-4
-		minConfidence = 20
+		maxError = 1e-2
+		maxHamming = 1
+		minConfidence = 25
 
 		# Access the 3D pose of all detected tag
 		for i, tag in enumerate(detections):
@@ -76,18 +77,23 @@ class Detector:
 			hamming         = tag.hamming
 			tag_num         = tag.tag_id
 			center          = tag.center
+			err             = tag.pose_err
 
 			# Gets pose data from the tag
 			rMatrix = tag.pose_R
 			tVecs   = tag.pose_t
-			err     = tag.pose_err
 
-			# Throws out noise
-			if ((hamming == 1) and (err <= maxError) and (decision_margin > minConfidence)):
-				# Creates a 3d pose array from the rotation matrix and translation vectors
-				pose = np.concatenate([rMatrix, tVecs], axis = 1)
+			# Throws out tags not present on the field
+			if (1 <= tag_num <= 8):
+				# Throws out noise
+				if ((hamming <= maxHamming) and (err <= maxError) and (decision_margin >= minConfidence)):
+					# Creates a 3d pose array from the rotation matrix and translation vectors
+					pose = np.concatenate([rMatrix, tVecs], axis = 1)
+				else:
+					# Detected tag is noise, move to next detection
+					continue
 			else:
-				# Detected tag is noise, move to next detection
+				# Detected tag is not on field, move to next detection
 				continue
 
 			# Prints debug info
@@ -119,7 +125,8 @@ class Detector:
 			results.extend([tag_num, err, pose, euler_angles])
 
 			# Updates log
-			Logger.logInfo("Tag: {}, \nrMatrix: \n{}, \ntVecs: \n{}, \nEuler Angles: \n{}, \nPose3d: \n{}".format(tag_num, pose[:3, :3], pose[:3, 3:], euler_angles, pose))
+			# Logger.logInfo("Tag: {}, \nrMatrix: \n{}, \ntVecs: \n{}, \nEuler Angles: \n{}, \nPose3d: \n{}".format(tag_num, pose[:3, :3], pose[:3, 3:], euler_angles, pose))
+			Logger.logDebug("Tag: {}, \nErr: {}, \nMargin: {}, \nHamming: {}".format(tag_num, err, decision_margin, hamming))
 
 		# Gets current time
 		time = self.timer.getFPGATimestamp()
