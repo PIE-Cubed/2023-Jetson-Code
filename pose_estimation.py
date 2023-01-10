@@ -9,6 +9,7 @@ from wpimath._controls._controls.controller import PIDController
 
 # Import Classes
 from Units          import Units
+from Logger         import Logger
 from communications import NetworkCommunications
 
 # Robot dimensions measured from the center of each wheel (inches)
@@ -27,10 +28,10 @@ RR_TRANSLATION = Translation2d(ROBOT_WIDTH_M / 2, -ROBOT_LENGTH_M / 2)
 
 # Creates the swerveKinematics constant
 swerveKinematics = SwerveDrive4Kinematics(
-    FL_TRANSLATION,
-    RL_TRANSLATION,
-    FR_TRANSLATION,
-    RR_TRANSLATION
+FL_TRANSLATION,
+RL_TRANSLATION,
+FR_TRANSLATION,
+RR_TRANSLATION
 )
 
 # Creates the PoseEstimator class
@@ -69,35 +70,8 @@ class PoseEstimator:
             visionTrust
         )
 
-    def resetPoseTrackers(self, pose: Pose2d):
-        """
-        Resets both pose trackers to a certian pose
-        @param pose: Pose2d
-        """
-        self.resetOdometry(pose)
-        self.resetPoseEstimator(pose)
-
-    def resetOdometry(self, pose: Pose2d):
-        """
-        Resets the SwerveOdometry to a pose.
-        @param pose: Pose2d
-        """
-        # Gets the module positions
-        allPositiions = self.getAllModulePositions()
-
-        # Resets the SwerveOdometry
-        self.odometry.resetPosition(self.generateRot2d(), pose, allPositiions[0], allPositiions[1], allPositiions[2], allPositiions[3])
-
-    def resetPoseEstimator(self, pose: Pose2d):
-        """
-        Resets the SwervePoseEstimator to a pose.
-        @param pose: Pose2d
-        """
-        # Gets the module positions
-        allPositiions = self.getAllModulePositions()
-
-        # Resets the SwerveOdometry
-        self.odometry.resetPosition(self.generateRot2d(), pose, allPositiions[0], allPositiions[1], allPositiions[2], allPositiions[3])
+        # Updates log
+        Logger.logInfo("PoseEstimator initialized")
 
     def updatePoseTrackers(self):
         """
@@ -145,21 +119,35 @@ class PoseEstimator:
                 detPose.toPose2d(),
                 detTime)
 
-    def getAllModulePositions(self):
+    def resetPoseTrackers(self, pose: Pose2d):
         """
-        Gets all the swerve module positions.
-        @return 
+        Resets both pose trackers to a certian pose
+        @param pose: Pose2d
         """
-        # Creates an array of zeros with a length of 4
-        allPositions = [0] * 4
+        self.resetOdometry(pose)
+        self.resetPoseEstimator(pose)
 
-        # Sets all the positions acordingly
-        allPositions[0] = self.comms.getFLPosition()
-        allPositions[1] = self.comms.getRLPosition()
-        allPositions[2] = self.comms.getFRPosition()
-        allPositions[3] = self.comms.getRRPosition()
+    def resetOdometry(self, pose: Pose2d):
+        """
+        Resets the SwerveOdometry to a pose.
+        @param pose: Pose2d
+        """
+        # Gets the module positions
+        allPositiions = self.getAllModulePositions()
 
-        return allPositions
+        # Resets the SwerveOdometry
+        self.odometry.resetPosition(self.generateRot2d(), pose, allPositiions[0], allPositiions[1], allPositiions[2], allPositiions[3])
+
+    def resetPoseEstimator(self, pose: Pose2d):
+        """
+        Resets the SwervePoseEstimator to a pose.
+        @param pose: Pose2d
+        """
+        # Gets the module positions
+        allPositiions = self.getAllModulePositions()
+
+        # Resets the SwerveOdometry
+        self.odometry.resetPosition(self.generateRot2d(), pose, allPositiions[0], allPositiions[1], allPositiions[2], allPositiions[3])
 
     def getBestResult(self, results):
         """
@@ -179,8 +167,8 @@ class PoseEstimator:
                 error = minError
                 bestResult = i
 
-            # Increment i
-            i += 1
+                # Increment i
+                i += 1
 
         # Extracts Pose Data
         flatPose = np.array(results[bestResult][2]).flatten()
@@ -198,6 +186,22 @@ class PoseEstimator:
         self.comms.sendBestResult(results[bestResult])
 
         return Pose3d(Translation3d(x, y, z), Rotation3d(roll, pitch, yaw))
+
+    def getAllModulePositions(self):
+        """
+        Gets all the swerve module positions.
+        @return 
+        """
+        # Creates an array of zeros with a length of 4
+        allPositions = [0] * 4
+
+        # Sets all the positions acordingly
+        allPositions[0] = self.comms.getFLPosition()
+        allPositions[1] = self.comms.getRLPosition()
+        allPositions[2] = self.comms.getFRPosition()
+        allPositions[3] = self.comms.getRRPosition()
+
+        return allPositions
 
     def getHeading(self):
         """

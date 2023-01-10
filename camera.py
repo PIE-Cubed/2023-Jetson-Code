@@ -4,6 +4,7 @@
 import cv2 as cv
 
 # Import Classes
+from Logger      import Logger
 from calibration import Calibrate
 
 # CONSTANTS
@@ -11,7 +12,6 @@ HIGH_VALUE = 10000
 
 # Creates the USBCamera class
 class USBCamera:
-    # Constructor
     def __init__(self, camNum) -> None:
         """
         Constructor for the USBCamera class.
@@ -24,6 +24,9 @@ class USBCamera:
         self.width  = -1
         self.height = -1
         self.fps    = -1
+
+        # Updates log
+        Logger.logInfo("USBCamera initialized")
 
     def autoResize(self):
         """
@@ -50,6 +53,9 @@ class USBCamera:
         print("Max Resolution:", str(self.width) + "x" + str(self.height))
         print("Max FPS:", self.fps)
 
+        # Updates log
+        Logger.logInfo("Capture resized")
+
         return self.cap
 
     def calibrateCamera(self, cap):
@@ -62,7 +68,7 @@ class USBCamera:
         @return translationVectors
         """
         # Instance creation
-        self.calibrate = Calibrate(cap, self.camNum)
+        self.calibrate = Calibrate(cap, self.camNum, 15)
 
         # Return results
         return self.calibrate.calibrateCamera()

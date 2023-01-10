@@ -2,6 +2,7 @@
 
 # Import Libraries
 import numpy as np
+from   Logger import Logger
 from   networktables import *
 from   wpimath.kinematics._kinematics import SwerveModulePosition
 
@@ -23,27 +24,29 @@ class NetworkCommunications:
 
         # Create a RobotData table and its entries
         RobotData = ntinst.getTable("RobotData")
-        self.gyroYaw        = RobotData.getEntry("GyroYaw")     # Double
-        self.currentTimeSec = RobotData.getEntry("CurrentTime") # Double
-        self.detectTime     = RobotData.getEntry("DetectTime")  # Double
-        self.FLRot          = RobotData.getEntry("FLRotation")  # Double
-        self.RLRot          = RobotData.getEntry("RLRotation")  # Double
-        self.FRRot          = RobotData.getEntry("FRRotation")  # Double
-        self.RRRot          = RobotData.getEntry("RRRotation")  # Double
-        self.FLVel          = RobotData.getEntry("FLVelocity")  # Double
-        self.RLVel          = RobotData.getEntry("RLVelocity")  # Double
-        self.FRVel          = RobotData.getEntry("FRVelocity")  # Double
-        self.RRVel          = RobotData.getEntry("RRVelocity")  # Double
+        self.gyroYaw    = RobotData.getEntry("GyroYaw")     # Double
+        self.detectTime = RobotData.getEntry("DetectTime")  # Double
+        self.FLRot      = RobotData.getEntry("FLRotation")  # Double
+        self.RLRot      = RobotData.getEntry("RLRotation")  # Double
+        self.FRRot      = RobotData.getEntry("FRRotation")  # Double
+        self.RRRot      = RobotData.getEntry("RRRotation")  # Double
+        self.FLVel      = RobotData.getEntry("FLVelocity")  # Double
+        self.RLVel      = RobotData.getEntry("RLVelocity")  # Double
+        self.FRVel      = RobotData.getEntry("FRVelocity")  # Double
+        self.RRVel      = RobotData.getEntry("RRVelocity")  # Double
 
         # Create a TagInfo Table and its Entries
         TagInfo = ntinst.getTable("TagInfo")
-        self.bestResult          = TagInfo.getEntry("")  # Double[]
+        self.bestResult = TagInfo.getEntry("BestResult")  # Double[]
+
+        # Updates log
+        Logger.logInfo("NetworkCommunications initialized")
 
     def sendBestResult(self, result):
         """
         Sends the result with the least erro.
 
-        This method will send [tagId, error, xTranslate, yTranslate, zTranslate, yaw, pitch, roll].
+        This method will send [tagId, xTranslate, yTranslate, zTranslate, yaw, pitch, roll].
         All translation data is in meters. All rotation data is in radians.
         @param result
         """
@@ -70,6 +73,13 @@ class NetworkCommunications:
 
         # Sends the data
         self.bestResult.setDoubleArray(data)
+
+    def sendDetectTimeSec(self, timeSec):
+        """
+        Send the time when a detection was made.
+        @param timeSec
+        """
+        self.detectTime.setDouble(timeSec)
 
     def getFLPosition(self):
         """
@@ -101,17 +111,3 @@ class NetworkCommunications:
 
     def getGyroYaw(self):
         return self.gyroYaw.getDouble(1000.00)
-
-    def getTimeSec(self):
-        """
-        Gets the current time in seconds as the RIO calculated it.
-        @return currentTime: Default value is -1.00
-        """
-        return self.currentTimeSec.getDouble(-1.00)
-
-    def sendDetectTimeSec(self, timeSec):
-        """
-        Send the time when a detection was made.
-        @param timeSec
-        """
-        self.detectTime.setDouble(timeSec)

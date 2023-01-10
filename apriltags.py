@@ -4,17 +4,18 @@
 import cv2   as cv
 import numpy as np
 import transforms3d
-import dt_apriltags
-from apriltag import apriltag
+import pupil_apriltags
+from wpilib import Timer
 
 # Import Classes
 from Units               import Units
+from Logger              import Logger
 from AprilTag            import AprilTag
 from AprilTagFieldLayout import AprilTagFieldLayout
 from communications      import NetworkCommunications
 
 # The size of the tag in meters
-tagSize = Units.inchesToMeters(8)
+tagSize = Units.inchesToMeters(6)
 
 # Creates the Detector Class
 class Detector:
@@ -26,12 +27,15 @@ class Detector:
         allTags = self.createAllTags()
 
         # Instance creation
-        self.field  = AprilTagFieldLayout(allTags, 2, 2, False)
         self.commms = NetworkCommunications()
+        self.field  = AprilTagFieldLayout(allTags, 2, 2, False)
+        self.timer  = Timer()
 
-        # Creates an apriltag detector
-        self.atdetector = apriltag("tag16h5")
-        self.dtdetector = dt_apriltags.Detector(families = "tag16h5", nthreads = 8, quad_decimate = 1.0, quad_sigma = 0.0, refine_edges = 1, decode_sharpening = 0.25)
+        # Creates a pupil apriltags detector
+        self.detector = pupil_apriltags.Detector(families = "tag16h5", nthreads = 16, quad_decimate = 1.0, quad_sigma = 0.0, refine_edges = 2.0, decode_sharpening = 1.00)
+
+        # Update logs
+        Logger.logInfo("Detector initialized")
 
     def detectTags(self, stream, camera_matrix, vizualization = 0, verbose = 0, annotate = False):
         """
@@ -53,26 +57,44 @@ class Detector:
         intrinsic_properties = (camera_matrix[0, 0], camera_matrix[1, 1], camera_matrix[0, 2], camera_matrix[1, 2])  # fx, fy, cx, cy
 
         # Detect the AprilTags in the image with Duckie Town Apriltags
-        detections = self.dtdetector.detect(gray, estimate_tag_pose = True, camera_params = intrinsic_properties, tag_size = tagSize)
+        detections = self.detector.detect(gray, estimate_tag_pose = True, camera_params = intrinsic_properties, tag_size = tagSize)
 
         # If verbose enabled, prints number of tags detected
         num_detections = len(detections)
         if (verbose == 1) or (verbose == 2) or (verbose == 3):
             print("Detected {} tags\n".format(num_detections))
 
-        # Creates the results array
+        # Creates variables to use in detections
         results = []
+        maxError = 1e-2
+        maxHamming = 1
+        minConfidence = 25
 
         # Access the 3D pose of all detected tag
         for i, tag in enumerate(detections):
             # Gets info from the tag
-            tag_num = tag.tag_id
+            decision_margin = tag.decision_margin
+            hamming         = tag.hamming
+            tag_num         = tag.tag_id
+            center          = tag.center
+            err             = tag.pose_err
+
+            # Gets pose data from the tag
             rMatrix = tag.pose_R
             tVecs   = tag.pose_t
-            err     = tag.pose_err
 
-            # Creates a 3d pose array from the rotation matrix and translation vectors
-            pose = np.concatenate([rMatrix, tVecs], axis = 1)
+            # Throws out tags not present on the field
+            if (1 <= tag_num <= 8):
+                # Throws out noise
+                if ((hamming <= maxHamming) and (err <= maxError) and (decision_margin >= minConfidence)):
+                    # Creates a 3d pose array from the rotation matrix and translation vectors
+                    pose = np.concatenate([rMatrix, tVecs], axis = 1)
+                else:
+                    # Detected tag is noise, move to next detection
+                    continue
+            else:
+                # Detected tag is not on field, move to next detection
+                continue
 
             # Prints debug info
             if (verbose == 2) or (verbose == 3):
@@ -83,10 +105,10 @@ class Detector:
             if (vizualization == 1):
                 self.draw_pose_box(stream, camera_matrix, pose)
             elif (vizualization == 2):
-                self.draw_pose_axes(stream, camera_matrix, pose, tag.center)
+                self.draw_pose_axes(stream, camera_matrix, pose, center)
             elif (vizualization == 3):
                 self.draw_pose_box(stream, camera_matrix, pose)
-                self.draw_pose_axes(stream, camera_matrix, pose, tag.center)
+                self.draw_pose_axes(stream, camera_matrix, pose, center)
 
             # Annotates the image
             if (annotate == True):
@@ -102,100 +124,12 @@ class Detector:
             # Adds results to the array
             results.extend([tag_num, err, pose, euler_angles])
 
-            print("Tag", tag_num, "Rotation Matrix: \n", pose[:3, :3])
-            print("Tag", tag_num, "Transformation Vectors: \n", pose[:3, 3:])
-            print("Tag", tag_num, "3D Pose: \n", pose)
-            print("Tag", tag_num, "Euler Angles: \n", euler_angles)
-        
-        # Gets current time
-        time = self.commms.getTimeSec()
-
-        # Sets detection time
-        self.commms.sendDetectTimeSec(time)
-
-        return results, stream
-
-    def atDetectTags(self, stream, camera_matrix, distortion_matrix, vizualization = 0, verbose = 0, annotate = False):
-        """
-        Detects AprilTags in a stream using apriltag.
-        @param stream: A stream generated by reading a VideoCapture
-        @param camera_matrix: The camera's calibration matrix
-        @param distortion_matrix: The camera's distortion matrix
-        @param vizualization: 0 - Highlight, 1 - Highlight + Boxes, 2 - Highlight + Axes, 3 - Highlight + Boxes + Axes
-        @param verbose: 0 - Silent, 1 - Number of detections, 2 - Detection data, 3 - Detection and pose data
-        @param annotate: Render annotated text on detection window
-        @return detectionResult, image
-        """
-        # If the stream is not grayscale, convert to grayscale
-        if (len(stream.shape) == 3):
-            gray = cv.cvtColor(stream, cv.COLOR_BGR2GRAY)
-        else:
-            gray = stream
-        
-        # Detect the AprilTags in the image with the Official AprilTags library
-        detections = self.atdetector.detect(gray)
-
-        # If verbose enabled, prints number of tags detected
-        num_detections = len(detections)
-        if (verbose == 1) or (verbose == 2) or (verbose == 3):
-            print("Detected {} tags\n".format(num_detections))
-
-        # Creates the results array
-        results = []
-
-        # Access the 3D pose of all detected tag
-        for i, tag in enumerate(detections):
-            # Extract the corner points of the AprilTag
-            tag_num       = tag["id"]
-            corner_points = tag["lb-rb-rt-lt"]
-
-            # Calculate the extrinsic parameters of the camera
-            rotation_vector, translation_vector, __ = cv.aruco.estimatePoseSingleMarkers([corner_points], tagSize, camera_matrix, distortion_matrix)
-
-            # Calculate the 3D pose of the AprilTag in the camera's coordinate system
-            rotation_matrix, _ = cv.Rodrigues(rotation_vector)
-
-            # Reshapes the array to the correct size
-            tVecs = translation_vector[0].reshape(3, 1)
-
-            # Creates a 3d pose array from the rotation matrix and translation vectors
-            pose = np.concatenate([rotation_matrix, tVecs], axis = 1)
-
-            # Prints debug info
-            if (verbose == 2) or (verbose == 3):
-                print( "Detection {} of {}:".format(i + 1, num_detections))
-                #print(tag.tostring(indent = 2))
-
-            # Draws varying levels of information onto the image
-            if (vizualization == 1):
-                self.draw_pose_box(stream, camera_matrix, pose)
-            elif (vizualization == 2):
-                self.draw_pose_axes(stream, camera_matrix, pose, tag["center"])
-            elif (vizualization == 3):
-                self.draw_pose_box(stream, camera_matrix, pose)
-                self.draw_pose_axes(stream, camera_matrix, pose, tag["center"])
-
-            # Annotates the image
-            if (annotate == True):
-                self.annotate_detection(stream, tag)
-
-            # Prints the Pose and calulated error
-            if (verbose == 3):
-                print("Pose: \n", pose)
-
-            # Calculate Euler's Angles
-            euler_angles = self.calculateEulerAngles(pose[:3, :3])
-
-            # Adds results to the array
-            results.extend([tag_num, 100, pose, euler_angles])
-
-            print("Tag", tag_num, "Rotation Matrix: \n", pose[:3, :3])
-            print("Tag", tag_num, "Transformation Vectors: \n", pose[:3, 3:])
-            print("Tag", tag_num, "3D Pose: \n", pose)
-            print("Tag", tag_num, "Euler Angles: \n", euler_angles)
+            # Updates log
+            Logger.logInfo("Tag: {}, \nrMatrix: \n{}, \ntVecs: \n{}, \nEuler Angles: \n{}, \nPose3d: \n{}".format(tag_num, pose[:3, :3], pose[:3, 3:], euler_angles, pose))
+            #Logger.logDebug("Tag: {}, \nErr: {}, \nMargin: {}, \nHamming: {}".format(tag_num, err, decision_margin, hamming))
 
         # Gets current time
-        time = self.commms.getTimeSec()
+        time = self.timer.getFPGATimestamp()
 
         # Sets detection time
         self.commms.sendDetectTimeSec(time)
@@ -255,31 +189,31 @@ class Detector:
         """
         # Creates object points
         opoints = np.array([
-            -1, -1, 0,
-            1, -1, 0,
-            1,  1, 0,
-            -1,  1, 0,
-            -1, -1, -2 * z_sign,
-            1, -1, -2 * z_sign,
-            1,  1, -2 * z_sign,
-            -1,  1, -2 * z_sign,
-        ]).reshape(-1, 1, 3) * 0.5 * tagSize
+                            -1, -1, 0,
+                            1, -1, 0,
+                            1,  1, 0,
+                            -1,  1, 0,
+                            -1, -1, -2 * z_sign,
+                            1, -1, -2 * z_sign,
+                            1,  1, -2 * z_sign,
+                            -1,  1, -2 * z_sign,
+                        ]).reshape(-1, 1, 3) * 0.5 * tagSize
 
         # Creates edges
         edges = np.array([
-            0, 1,
-            1, 2,
-            2, 3,
-            3, 0,
-            0, 4,
-            1, 5,
-            2, 6,
-            3, 7,
-            4, 5,
-            5, 6,
-            6, 7,
-            7, 4
-        ]).reshape(-1, 2)
+                            0, 1,
+                            1, 2,
+                            2, 3,
+                            3, 0,
+                            0, 4,
+                            1, 5,
+                            2, 6,
+                            3, 7,
+                            4, 5,
+                            5, 6,
+                            6, 7,
+                            7, 4
+                        ]).reshape(-1, 2)
 
         # Calulcates rotation and translation vectors for each AprilTag
         rVecs, _ = cv.Rodrigues(pose[:3,:3])
@@ -315,7 +249,8 @@ class Detector:
         # Calculate object points of each AprilTag
         opoints = np.float32([[1, 0, 0],
                               [0, -1, 0],
-                              [0, 0, -1]]).reshape(-1, 3) * tagSize
+                              [0, 0, -1]
+                            ]).reshape(-1, 3) * tagSize
 
         # Calulate image points of each AprilTag
         ipoints, _ = cv.projectPoints(opoints, rVecs, tVecs, camera_matrix, dcoeffs)
@@ -329,21 +264,6 @@ class Detector:
         cv.line(img, center, tuple(ipoints[0].ravel()), (0,0,255), 2)
         cv.line(img, center, tuple(ipoints[1].ravel()), (0,255,0), 2)
         cv.line(img, center, tuple(ipoints[2].ravel()), (255,0,0), 2)
-    
-    def draw(self, img, corners, imgpts):
-        imgpts = np.int32(imgpts).reshape(-1,2)
-
-        # draw ground floor in green
-        img = cv.drawContours(img, [imgpts[:4]],-1,(0,255,0),-3)
-
-        # draw pillars in blue color
-        for i,j in zip(range(4),range(4,8)):
-            img = cv.line(img, tuple(imgpts[i]), tuple(imgpts[j]),(255),3)
-
-        # draw top layer in red color
-        img = cv.drawContours(img, [imgpts[4:]],-1,(0,0,255),3)
-
-        return img
 
     def annotate_detection(self, img, tag):
         """
@@ -371,14 +291,14 @@ class Detector:
 
         # Writes the text to the image
         cv.putText(img, text, (text_x, text_y), font, font_size, (0, 255, 255), 2)
-    
+
     def createAllTags(self):
         """
         Creates all known AprilTags.
         @return allKnownTags: An array with all the known tags contained in it
         """
         allKnownTags = [
-            AprilTag(0, 1, 1, 1, 1, 1, 1)
+        AprilTag(0, 1, 1, 1, 1, 1, 1)
         ]
 
         return allKnownTags

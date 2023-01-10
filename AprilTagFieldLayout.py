@@ -38,7 +38,7 @@ class AprilTagFieldLayout:
     def setOrigin(self, origin):
         """
         Sets the origin based on a predefined enumeration of coordinate frame origins. The origins are calculated from the field dimensions.
-        
+
         This transforms the Pose3ds returned by getTagPose() to return the correct pose relative to a predefined coordinate frame.
         @param origin: The predefined origin
         """
@@ -48,7 +48,9 @@ class AprilTagFieldLayout:
             self.setOrigin(
                 Pose3d(
                     Translation3d(self.fieldLength, self.fieldWidth, 0),
-                    Rotation3d(0, 0, np.pi)))
+                    Rotation3d(0, 0, np.pi)
+                )
+            )
         else:
             raise ValueError("Unsupported enumerator value.")
 

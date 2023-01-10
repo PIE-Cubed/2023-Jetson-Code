@@ -3,7 +3,7 @@
 # Import Libraries
 from wpimath.geometry._geometry import *
 
-# Start of the AprilTagPose class
+# Start of the AprilTag class
 class AprilTag:
     def __init__(self, id: int, pose: Pose3d) -> None:
         """
@@ -62,10 +62,14 @@ class AprilTag:
 
     def getId(self) -> int:
         """
+        Gets the id of the given tag.
+        @return tagId
         """
         return self.id
 
     def getPose(self) -> Pose3d:
         """
+        Gets the pose of the given tag.
+        @return tagPose
         """
         return self.pose
