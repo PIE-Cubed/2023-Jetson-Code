@@ -34,7 +34,7 @@ class Logger:
         logging.warning(warning)
 
     @staticmethod
-    def logwriteError(error):
+    def logError(error):
         """
         Logs an error.
         @param error
