@@ -7,7 +7,7 @@
 
 <h2> Setting Up the Jetson </h2>
 <p>
-	Please see the instructions <a href="https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit">here</a> for setting up an Nvidia Jetson.
+	Please see the instructions <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/wiki/Setup#----setting-up-the-jetson-nano">here</a> for setting up a Nvidia Jetson.
 </p>
 
 </br>
@@ -49,12 +49,12 @@
 
 <h2> Writing Programs for Jetson </h2>
 <p>
-	This is addressed in detail in the <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/wiki">wiki</a>.
+	This is addressed in detail <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/wiki">here</a>, in the repository's wiki.
 </p>
 
 </br>
 
 <h2> More details </h2>
 <p>
-	If you'd like to learn more, all of these sections (and more!) will be explained in greater detail in the <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/wiki">wiki</a>.
+	If you'd like to learn more, all of these sections (and more!) will be explained in greater detail in the repository's <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/wiki">wiki</a>.
 </p>
