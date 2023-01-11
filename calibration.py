@@ -6,8 +6,8 @@ import glob
 import cv2   as cv
 import numpy as np
 
-# Import Classes
-from Logger import Logger
+# Import Utilities
+from Utilities.Logger import Logger
 
 # Defines the dimensions of the chessboard
 CHESSBOARD = (7, 7)  # Number of interior corners (width in squares - 1 x height in squares - 1)
@@ -17,7 +17,7 @@ criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 # Creates the Calibrate class
 class Calibrate:
-    def __init__(self, cap, camNum: int, images = 15) -> None:
+    def __init__(self, cap, camNum: int, numImages = 15) -> None:
         """
         Constructor for the Calibrate class.
         @param VideoCapture
@@ -26,7 +26,7 @@ class Calibrate:
         # Localizes parameters
         self.cap               = cap
         self.camNum            = camNum
-        self.calibrationImages = images
+        self.calibrationImages = numImages
 
         # Get height and width
         self.width  = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH))
@@ -50,7 +50,7 @@ class Calibrate:
         self.doOver = False
 
         # Updates log
-        Logger.logInfo("Calibrate initialized")
+        Logger.logInfo("Calibration initialized")
 
     def calibrateCamera(self):
         """
@@ -85,11 +85,11 @@ class Calibrate:
             # Converts images to grayscale
             gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-            # Finds chess board corners. ret is true only if the desired number of corners are found
+            # Finds chessboard corners. ret is true only if the desired number of corners are found
             ret, corners = cv.findChessboardCorners(gray, CHESSBOARD, cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_FAST_CHECK + cv.CALIB_CB_NORMALIZE_IMAGE)
 
             # Desired number of corners found, add object and image points after refining them
-            if ret == True:
+            if (ret == True):
                 # Adds the objectpoint
                 self.objPoints.append(self.objp)
 
@@ -147,7 +147,7 @@ class Calibrate:
 
         # Updates log
         Logger.logInfo("Camera {} Calibrated".format(self.camNum))
-        Logger.logInfo("Camera Matrix: \n{}, \nDistortion Matrix: \n{}, \nRotation Vectors: \n{}, \nTranslation Vectors: \n{}, \nAverage Reprediction Value: {}".format(self.cameraMatrix, self.distortion, self.rVecs, self.tVecs, repredictError))
+        Logger.logInfo("Camera Properties: \nCamera Matrix: \n{}, \nDistortion Matrix: \n{}, \nRotation Vectors: \n{}, \nTranslation Vectors: \n{}, \nAverage Reprediction Value: {}".format(self.cameraMatrix, self.distortion, self.rVecs, self.tVecs, repredictError))
 
         # Return calibration results
         return self.ret, self.cameraMatrix, self.distortion, self.rVecs, self.tVecs
@@ -235,8 +235,8 @@ class Calibrate:
         # Attempts to make a directory at self.PATH
         try:
             os.mkdir(self.PATH)
-        except:
-            pass
+        except Exception as e:
+            Logger.logError("{}".format(e))
 
         # Attempts to read the last callibration image and updates variables accordingly
         img = cv.imread(self.PATH + "{}".format(self.calibrationImages) + self.EXTENSION)
