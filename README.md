@@ -31,7 +31,7 @@
 <p>
 	Download <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/blob/main/Install.sh">Install.sh</a> and run it from the terminal using this command: 
 	
-	sh Install.sh
+	sh ./Install.sh
 </p>
 <p>
 	<strong>Note: DO NOT run the above command with root provledges as that will cause cmake and pip to install their packages to the wrong location, breaking other package dependencies.</strong>
