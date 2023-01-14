@@ -6,6 +6,9 @@ from wpimath.geometry._geometry import *
 
 # Import Utilities
 from enum import Enum
+from typing import Sequence
+from Utilities.Logger import Logger
+from Utilities.AprilTag import AprilTag
 
 # Creates the AprilTagFieldLayout class
 class AprilTagFieldLayout:
@@ -13,7 +16,7 @@ class AprilTagFieldLayout:
         kBlueAllianceWallRightSide = "BlueWall"
         kRedAllianceWallRightSide  = "RedWall"
 
-    def __init__(self, tags: list, fieldLength: float, fieldWidth: float, isRed = False) -> None:
+    def __init__(self, tags: Sequence[AprilTag], fieldLength: float, fieldWidth: float, isRed = False) -> None:
         """
         Generates a field with AprilTags
         @param allTags: A list of all known tags
@@ -21,16 +24,25 @@ class AprilTagFieldLayout:
         @param fieldWidth: The width (x) of the field in meters
         @param isRed: If we are on the red alliance
         """
+        # Asserts that the array length is no greater than 8
+        assert(len(tags) <= 8)
+
         # Localize parameters
         self.fieldLength = fieldLength
         self.fieldWidth = fieldWidth
 
         # The allTags array
-        self.allTags = [Pose3d()] * 10
+        self.allTags = [Pose3d()] * 8
 
         # Sorts the data from tags into allTags
         for tag in tags:
-            self.allTags[tag.getId()] = tag.getPose()
+            id = tag.getId()
+            pose = tag.getPose()
+
+            self.allTags[id] = pose
+
+            # Logs the tag information
+            Logger.logInfo("Tag {}. Pose: {}".format(id, pose))
 
         # Variables
         self.m_origin = None
@@ -65,12 +77,13 @@ class AprilTagFieldLayout:
         """
         return self.allTags
 
-    def getTagPose(self, id):
+    def getTagPose(self, id: int):
         """
         Returns the pose of the selected tag
         @return Pose3d
         """
         try:
             return self.allTags[id].relativeTo(self.m_origin)
-        except:
+        except Exception as e:
+            Logger.logError(e)
             return Pose3d()

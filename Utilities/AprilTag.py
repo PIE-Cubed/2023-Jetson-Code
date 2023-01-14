@@ -1,7 +1,7 @@
 # Created by Alex Pereira
 
 # Import Libraries
-from wpimath.geometry._geometry import *
+from wpimath.geometry._geometry import Translation3d, Rotation3d, Pose3d
 
 # Start of the AprilTag class
 class AprilTag:
@@ -26,7 +26,7 @@ class AprilTag:
         self.id = id
         self.pose = Pose3d(trans, rot)
 
-    def __init__(self, id: int, x, y, z, rMatrix) -> None:
+    def __init__(self, id: int, x: float, y: float, z: float, rMatrix) -> None:
         """
         Constructor for the AprilTagPose class.
         @param tagId
@@ -43,7 +43,7 @@ class AprilTag:
         self.id = id
         self.pose = Pose3d(trans, rot)
 
-    def __init__(self, id: int, x, y, z, roll, pitch, yaw) -> None:
+    def __init__(self, id: int, x: float, y: float, z: float, roll: float, pitch: float, yaw: float) -> None:
         """
         Constructor for the AprilTagPose class.
         @param tagId
