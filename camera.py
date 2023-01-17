@@ -4,8 +4,10 @@
 import cv2 as cv
 
 # Import Classes
-from Logger      import Logger
 from calibration import Calibrate
+
+# Import Utilities
+from Utilities.Logger import Logger
 
 # CONSTANTS
 HIGH_VALUE = 10000

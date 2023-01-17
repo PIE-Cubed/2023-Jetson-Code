@@ -134,16 +134,8 @@ class Calibrate:
         # Calibrate the camera by passing the value of known 3D points (objPoints) and corresponding pixel coordinates of the detected corners (imgPoints)
         self.ret, self.cameraMatrix, self.distortion, self.rVecs, self.tVecs = cv.calibrateCamera(self.objPoints, self.imgPoints, gray.shape[::-1], None, None)
 
-        # Print calibration reults
-        print("Camera {} Calibrated: ".format(self.camNum), self.ret)
-        print("\nCamera Matrix:\n", self.cameraMatrix)
-        print("\nDistortion Matrix:\n", self.distortion)
-        print("\nCamera rVecs:\n", self.rVecs)
-        print("\nCamera tVecs:\n", self.tVecs)
-
-        # Prints the reprediction error
+        # Calculates the reprediction error
         repredictError = self.calculateRepredictionError()
-        print("\nAverage Reprediction Error: {}".format(repredictError) )
 
         # Updates log
         Logger.logInfo("Camera {} Calibrated".format(self.camNum))
