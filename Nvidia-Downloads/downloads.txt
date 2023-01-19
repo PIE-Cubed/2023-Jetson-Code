@@ -1,5 +1,0 @@
-https://github.com/PIE-Cubed/2023-Jetson-Code/raw/testing/Nvidia-Downloads/sources.list.d.zip
-https://github.com/PIE-Cubed/2023-Jetson-Code/raw/testing/Nvidia-Downloads/cuda-repo-l4t-10-2-local.zip
-https://github.com/PIE-Cubed/2023-Jetson-Code/raw/testing/Nvidia-Downloads/visionworks-repo.zip
-https://github.com/PIE-Cubed/2023-Jetson-Code/raw/testing/Nvidia-Downloads/visionworks-sfm-repo.zip
-https://github.com/PIE-Cubed/2023-Jetson-Code/raw/testing/Nvidia-Downloads/visionworks-tracking-repo.zip
