@@ -2,9 +2,9 @@
 
 # Import Libraries
 from typing import Sequence
+from wpimath.geometry import *
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.geometry._geometry import *
-from wpimath.kinematics._kinematics  import SwerveDrive4Kinematics, SwerveDrive4Odometry, SwerveModulePosition
+from wpimath.kinematics  import SwerveDrive4Kinematics, SwerveDrive4Odometry, SwerveModulePosition
 
 # Import Classes
 from communications import NetworkCommunications
@@ -246,7 +246,7 @@ class PoseEstimator:
         """
         return self.poseEstimator.getEstimatedPosition()
 
-    def getAllModulePositions(self):
+    def getAllModulePositions(self) -> Sequence[SwerveModulePosition]:
         """
         Gets all the swerve module positions.
         @return allSwerveModulePositions

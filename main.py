@@ -2,7 +2,7 @@
 
 # Import Libraries
 import cv2 as cv
-from wpimath.geometry._geometry import Pose2d
+from wpimath.geometry import Pose2d
 
 # Import Classes
 from camera import USBCamera
@@ -35,7 +35,7 @@ startPos = Pose2d(
 
 # Main loop
 while (cap.isOpened() == True):
-    # Resets the starting position once the auto path is slected
+    # Resets the starting position once the auto path is selected
     if ((autoPath is not None) and (prevPath != autoPath)):
         prevPath = autoPath
 
@@ -52,7 +52,7 @@ while (cap.isOpened() == True):
     stream = detector.undistort(stream, camMatrix, camdistortion, camresolution)
 
     # Runs April Tag detection on the undistorted image
-    results, stream = detector.detectTags(stream, camMatrix, 3, False)
+    results, stream = detector.detectTags(stream, camMatrix, 3)
 
     # Determine Pose2d based on vision measurements
     floorPose = robotPose.getVisionPose()

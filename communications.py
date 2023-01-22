@@ -4,8 +4,8 @@
 import numpy as np
 from typing import Sequence
 from networktables import *
-from wpimath.geometry._geometry import *
-from wpimath.kinematics._kinematics import SwerveModulePosition
+from wpimath.geometry import *
+from wpimath.kinematics import SwerveModulePosition
 
 # Import Utilities
 from Utilities.Units import Units
