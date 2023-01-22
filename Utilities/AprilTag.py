@@ -1,7 +1,7 @@
 # Created by Alex Pereira
 
 # Import Libraries
-from wpimath.geometry._geometry import Translation3d, Rotation3d, Pose3d
+from wpimath.geometry import Translation3d, Rotation3d, Pose3d
 
 # Start of the AprilTag class
 class AprilTag:

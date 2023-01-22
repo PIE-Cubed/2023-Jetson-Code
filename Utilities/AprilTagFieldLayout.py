@@ -2,11 +2,11 @@
 
 # Import Libraries
 import numpy as np
-from wpimath.geometry._geometry import *
+from wpimath.geometry import *
 
 # Import Utilities
 from enum import Enum
-from typing import Sequence
+from typing import Optional, Sequence
 from Utilities.Logger import Logger
 from Utilities.AprilTag import AprilTag
 
@@ -77,13 +77,9 @@ class AprilTagFieldLayout:
         """
         return self.allTags
 
-    def getTagPose(self, id: int):
+    def getTagPose(self, id: int) -> Optional[Pose3d]:
         """
         Returns the pose of the selected tag
         @return Pose3d
         """
-        try:
-            return self.allTags[id].relativeTo(self.m_origin)
-        except Exception as e:
-            Logger.logError(e)
-            return Pose3d()
+        return Optional[self.allTags[id].relativeTo(self.m_origin)]
