@@ -4,7 +4,7 @@
 from typing import Sequence
 from wpimath.geometry import *
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.kinematics  import SwerveDrive4Kinematics, SwerveDrive4Odometry, SwerveModulePosition
+from wpimath.kinematics import SwerveDrive4Kinematics, SwerveDrive4Odometry, SwerveModulePosition
 
 # Import Classes
 from communications import NetworkCommunications
@@ -104,6 +104,9 @@ class PoseEstimator:
         # Creates all known AprilTags and creates a field
         allTags    = self.createAllTags()
         self.field = AprilTagFieldLayout(allTags, FIELD_LENGTH_M, FIELD_WIDTH_M, False)
+
+        # Creates the field
+        # self.field = AprilTagFieldLayout(False)  # Uncomment for match play
 
         # Variables
         self.prevTime = 0
@@ -281,6 +284,7 @@ class PoseEstimator:
         Creates all known AprilTags.
         @return allKnownTags: An array with all the known tags contained in it
         """
+        # Stores locations used for testing
         allKnownTags = [
             AprilTag(1, Units.inchesToMeters(144 + 66 + 12), Units.inchesToMeters(98), Units.inchesToMeters(30.5 + 34), 0, 0, Units.degreesToRadians(-90)),
             AprilTag(2, Units.inchesToMeters(144 + 66 + 12), Units.inchesToMeters(12), Units.inchesToMeters(30.5 + 20), 0, 0, Units.degreesToRadians(-90)),

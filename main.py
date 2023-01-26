@@ -14,8 +14,8 @@ from Utilities.Units import Units
 from Utilities.Logger import Logger
 
 # Instance creation
-detector   = Detector()
-robotPose  = PoseEstimator()
+detector  = Detector()
+robotPose = PoseEstimator()
 
 # Creates a VideoCapture and gets its properties
 camera        = USBCamera(0)

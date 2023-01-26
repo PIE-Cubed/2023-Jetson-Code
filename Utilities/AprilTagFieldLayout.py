@@ -1,6 +1,7 @@
 # Created by Alex Pereira
 
 # Import Libraries
+import json
 import numpy as np
 from wpimath.geometry import *
 
@@ -16,9 +17,29 @@ class AprilTagFieldLayout:
         kBlueAllianceWallRightSide = "BlueWall"
         kRedAllianceWallRightSide  = "RedWall"
 
+    def __init__(self, isRed = False) -> None:
+        """
+        Generates the offical field with AprilTags for match play
+        @param isRed: If we are on the red alliance
+        """
+        # Creates the allTags array
+        self.allTags = [Pose3d()] * 9
+
+        # Loads the json file
+        self.readJson("2023-chargedup")
+
+        # Variables
+        self.m_origin = None
+
+        # Sets the origin depending on alliance
+        if (isRed == True):
+            self.setOrigin(AprilTagFieldLayout.Origin.kRedAllianceWallRightSide)
+        elif (isRed == False):
+            self.setOrigin(AprilTagFieldLayout.Origin.kBlueAllianceWallRightSide)
+
     def __init__(self, tags: Sequence[AprilTag], fieldLength: float, fieldWidth: float, isRed = False) -> None:
         """
-        Generates a field with AprilTags
+        Generates an field with AprilTags for testing
         @param allTags: A list of all known tags
         @param fieldLength: The length (y) of the field in meters
         @param fieldWidth: The width (x) of the field in meters
@@ -31,8 +52,11 @@ class AprilTagFieldLayout:
         self.fieldLength = fieldLength
         self.fieldWidth = fieldWidth
 
-        # The allTags array
-        self.allTags = [Pose3d()] * 8
+        # Logs the field size
+        Logger.logInfo("Field length: {}, Field width: {}".format(self.fieldLength, self.fieldWidth))
+
+        # Creates the allTags array
+        self.allTags = [Pose3d()] * 9
 
         # Sorts the data from tags into allTags
         for tag in tags:
@@ -50,8 +74,57 @@ class AprilTagFieldLayout:
         # Sets the origin depending on alliance
         if (isRed == True):
             self.setOrigin(AprilTagFieldLayout.Origin.kRedAllianceWallRightSide)
-        elif(isRed == False):
+        elif (isRed == False):
             self.setOrigin(AprilTagFieldLayout.Origin.kBlueAllianceWallRightSide)
+
+    def readJson(self, name: str):
+        """
+        Extracts information from the json file about field size and tag locations
+        @param name: The name of the json file 
+        """
+        # Opens the json
+        file = open("../" + name + ".json")
+
+        # Returns JSON object as a dictionary
+        data = json.load(file)
+        
+        # Loops through the json data
+        for tag in data["tags"]:
+            # Gets the tag ID
+            id = tag["ID"]
+
+            # Gets the tag's translation data
+            x_trans = tag["pose"]["translation"]["x"]
+            y_trans = tag["pose"]["translation"]["y"]
+            z_trans = tag["pose"]["translation"]["z"]
+
+            # Gets the tag's rotation data
+            w_rot = tag["pose"]["rotation"]["quaternion"]["W"]
+            x_rot = tag["pose"]["rotation"]["quaternion"]["X"]
+            y_rot = tag["pose"]["rotation"]["quaternion"]["Y"]
+            z_rot = tag["pose"]["rotation"]["quaternion"]["Z"]
+
+            # Creates a quaternion
+            q = Quaternion(w_rot, x_rot, y_rot, z_rot)
+
+            # Creates a Pose3d object
+            pose = Pose3d(x_trans, y_trans, z_trans, Rotation3d(q))
+
+            # Adds the tag to the allTags array
+            self.allTags[id] = pose
+
+            # Logs the tag's information
+            Logger.logInfo("Tag {}. Pose: {}".format(id, pose))
+
+        # Sets the field dimensions
+        self.fieldLength = data["field"]["length"]
+        self.fieldWidth  = data["field"]["width"]
+
+        # Logs the field size
+        Logger.logInfo("Field length: {}, Field width: {}".format(self.fieldLength, self.fieldWidth))
+
+        # Closes the file
+        file.close()
 
     def setOrigin(self, origin):
         """
