@@ -28,7 +28,7 @@ class Detector:
         self.comms = NetworkCommunications()
 
         # Creates a pupil apriltags detector
-        self.detector = pupil_apriltags.Detector(families = "tag16h5", nthreads = 4, quad_decimate = 1.0, quad_sigma = 0.0, refine_edges = 2.0, decode_sharpening = 1.00)
+        self.detector = pupil_apriltags.Detector(families = "tag16h5", nthreads = 10, quad_decimate = 1.0, quad_sigma = 0.0, refine_edges = 2.0, decode_sharpening = 1.00)
 
         # Update logs
         Logger.logInfo("Detector initialized")
@@ -64,7 +64,7 @@ class Detector:
         maxMargin = 0
 
         # Access the 3D pose of all detected tag
-        for i, tag in enumerate(detections):
+        for tag in detections:
             # Gets info from the tag
             decision_margin = tag.decision_margin
             hamming         = tag.hamming
