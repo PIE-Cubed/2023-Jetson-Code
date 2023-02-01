@@ -2,7 +2,6 @@
 
 # Import Libraries
 import cv2 as cv
-from wpimath.geometry import Pose2d
 
 # Import Classes
 from camera import USBCamera
