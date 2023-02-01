@@ -2,13 +2,10 @@
 
 # Import Libraries
 import numpy as np
-from typing import Sequence
 from networktables import *
 from wpimath.geometry import *
-from wpimath.kinematics import SwerveModulePosition
 
 # Import Utilities
-from Utilities.Units import Units
 from Utilities.Logger import Logger
 
 # Variables
