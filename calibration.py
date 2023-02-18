@@ -41,7 +41,7 @@ class Calibrate:
         self.imgPoints = []  # 2D point in image plane
 
         # Path to calibration images
-        self.PATH = "./camera{}-{}x{}-images/".format(self.camNum, self.width, self.height)
+        self.PATH = "/home/robolions/Documents/2023-Jetson-Code-Test/camera{}-{}x{}-images/".format(self.camNum, self.width, self.height)
 
         # File extension
         self.EXTENSION = ".png"

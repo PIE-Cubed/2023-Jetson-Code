@@ -55,9 +55,9 @@ class Detector:
 
         # Variables to use in detections
         results = []
-        maxError = 1e-2
+        maxError = 1e-3
         maxHamming = 1
-        minConfidence = 25
+        minConfidence = 30
 
         # Variables to use in sorting the data
         best = None
@@ -124,7 +124,7 @@ class Detector:
         time = self.timer.getFPGATimestamp()
 
         # Sets detection time
-        self.comms.setDetectTimeSec(time)
+        self.comms.setDetectionTimeSec(time)
 
         return results, stream
 
