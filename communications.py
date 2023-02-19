@@ -67,7 +67,7 @@ class NetworkCommunications:
         flatAngles = np.array(eulerAngles).flatten()
 
         # Extracts the x, y, and z translations relative to the field's WCS
-        x, y, z = flatPose[3], flatPose[11], -flatPose[7]
+        x, y, z = flatPose[11], flatPose[3], -flatPose[7]
 
         # Extracts the tag's roll, yaw, and pitch relative to the field's WCS
         roll, pitch, yaw = flatAngles[2], flatAngles[0], flatAngles[1]
