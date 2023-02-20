@@ -28,20 +28,14 @@
 </p>
 <p>
 
-    pip install -U pip wheel setuptools
-</p>
-
-<h3>If on Windows:</h3>
-<p>
-
-    pip install transforms3d opencv-contrib-python pupil-apriltags robotpy[apriltag]
+    pip install -U pip wheel setuptools transforms3d opencv-contrib-python pupil-apriltags robotpy[cscore]
 </p>
 
 <h2> How to install on Windows: </h2>
 <p>
     Install <a href="https://www.python.org/downloads/release/python-3108/" target="_blank">Python 3.10.8</a> for Windows, being sure to add Python to PATH. Then, install the required packages using this command:</li>
     
-    pip install transforms3d opencv-contrib-python pupil-apriltags robotpy[apriltag]
+    pip install -U pip wheel setuptools transforms3d opencv-contrib-python pupil-apriltags robotpy[cscore]
 </p>
 
 <h2> Writing Programs for Jetson </h2>
