@@ -2,9 +2,11 @@
 
 # Import Libraries
 import numpy as np
-from   Logger import Logger
 from   networktables import *
-from   wpimath.kinematics._kinematics import SwerveModulePosition
+from   wpimath.geometry import *
+
+# Import Utilities
+from Utilities.Logger import Logger
 
 # Variables
 firstTime = True
@@ -15,6 +17,9 @@ class NetworkCommunications:
         """
         Constructor for the NetworkCommunications class.
         """
+        # Start a NetworkTables client
+        NetworkTables.startClientTeam(2199)
+
         # Get a NetworkTables Instance
         ntinst = NetworkTablesInstance.getDefault()
 
@@ -22,29 +27,26 @@ class NetworkCommunications:
         FMSInfo = ntinst.getTable("FMSInfo")
         self.isRedAlliance = FMSInfo.getEntry("IsRedAlliance")  # Boolean
 
-        # Create a RobotData table and its entries
-        RobotData = ntinst.getTable("RobotData")
-        self.gyroYaw    = RobotData.getEntry("GyroYaw")     # Double
-        self.detectTime = RobotData.getEntry("DetectTime")  # Double
-        self.FLRot      = RobotData.getEntry("FLRotation")  # Double
-        self.RLRot      = RobotData.getEntry("RLRotation")  # Double
-        self.FRRot      = RobotData.getEntry("FRRotation")  # Double
-        self.RRRot      = RobotData.getEntry("RRRotation")  # Double
-        self.FLVel      = RobotData.getEntry("FLVelocity")  # Double
-        self.RLVel      = RobotData.getEntry("RLVelocity")  # Double
-        self.FRVel      = RobotData.getEntry("FRVelocity")  # Double
-        self.RRVel      = RobotData.getEntry("RRVelocity")  # Double
-
         # Create a TagInfo Table and its Entries
         TagInfo = ntinst.getTable("TagInfo")
-        self.bestResult = TagInfo.getEntry("BestResult")  # Double[]
+        self.targetValid   = TagInfo.getEntry("tv")            # Boolean
+        self.bestResult    = TagInfo.getEntry("BestResult")    # Double[]
+        self.bestResultId  = TagInfo.getEntry("BestResultId")  # Double
+        self.detectionTime = TagInfo.getEntry("DetectionTime") # Double
 
         # Updates log
         Logger.logInfo("NetworkCommunications initialized")
 
-    def sendBestResult(self, result):
+    def setBestResultId(self, id: int):
         """
-        Sends the result with the least erro.
+        Sets the tag id of the best result.
+        @param tagId
+        """
+        self.bestResultId.setDouble(id)
+
+    def setBestResult(self, result):
+        """
+        Sends the best result.
 
         This method will send [tagId, xTranslate, yTranslate, zTranslate, yaw, pitch, roll].
         All translation data is in meters. All rotation data is in radians.
@@ -52,9 +54,11 @@ class NetworkCommunications:
         """
         # Gets variables from result
         tagId       = result[0]
-        error       = result[1]
-        pose        = result[2]
-        eulerAngles = result[3]
+        pose        = result[1]
+        eulerAngles = result[2]
+
+        # Sets the tag value
+        self.setBestResultId(tagId)
 
         # Flattens the pose array into a 1D array
         flatPose = np.array(pose).flatten()
@@ -62,52 +66,28 @@ class NetworkCommunications:
         # Flattens the eulerAngles array into a 1D array
         flatAngles = np.array(eulerAngles).flatten()
 
-        # Extracts the x, y, and z translations
-        x, y, z = flatPose[3], flatPose[7], flatPose[11]
+        # Extracts the x, y, and z translations relative to the field's WCS
+        x, y, z = flatPose[11], flatPose[3], -flatPose[7]
 
-        # Extracts the tag's roll, yaw, and pitch
-        pitch, yaw, roll = flatAngles[3], flatAngles[7], flatAngles[11]
+        # Extracts the tag's roll, yaw, and pitch relative to the field's WCS
+        roll, pitch, yaw = flatAngles[2], flatAngles[0], flatAngles[1]
 
         # Packs all the data
-        data = (tagId, error, x, y, z, roll, pitch, yaw)
+        data = (tagId, x, y, z, roll, pitch, yaw)
 
         # Sends the data
         self.bestResult.setDoubleArray(data)
 
-    def sendDetectTimeSec(self, timeSec):
+    def setTargetValid(self, tv: bool):
         """
-        Send the time when a detection was made.
+        Sets if a valid target was detected.
+        @param tv
+        """
+        self.targetValid.setBoolean(tv)
+
+    def setDetectionTimeSec(self, timeSec: float):
+        """
+        Sets the time when a detection was made.
         @param timeSec
         """
-        self.detectTime.setDouble(timeSec)
-
-    def getFLPosition(self):
-        """
-        Gets the SwerveModulePosition of the Front Left module.
-        @return SwerveModulePosition
-        """
-        return SwerveModulePosition(self.FLVel.getDouble(0), self.FLRot.getDouble(0))
-
-    def getRLPosition(self):
-        """
-        Gets the SwerveModulePosition of the Rear Left module.
-        @return SwerveModulePosition
-        """
-        return SwerveModulePosition(self.RLVel.getDouble(0), self.RLRot.getDouble(0))
-
-    def getFRPosition(self):
-        """
-        Gets the SwerveModulePosition of the Front Right module.
-        @return SwerveModulePosition
-        """
-        return SwerveModulePosition(self.FRVel.getDouble(0), self.FRRot.getDouble(0))
-
-    def getRRPosition(self):
-        """
-        Gets the SwerveModulePosition of the Rear Right module.
-        @return SwerveModulePosition
-        """
-        return SwerveModulePosition(self.RRVel.getDouble(0), self.RRRot.getDouble(0))
-
-    def getGyroYaw(self):
-        return self.gyroYaw.getDouble(1000.00)
+        self.detectionTime.setDouble(timeSec)

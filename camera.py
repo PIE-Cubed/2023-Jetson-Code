@@ -4,8 +4,10 @@
 import cv2 as cv
 
 # Import Classes
-from Logger      import Logger
 from calibration import Calibrate
+
+# Import Utilities
+from Utilities.Logger import Logger
 
 # CONSTANTS
 HIGH_VALUE = 10000
@@ -28,17 +30,32 @@ class USBCamera:
         # Updates log
         Logger.logInfo("USBCamera initialized")
 
+    def calibrateCamera(self, cap):
+        """
+        Calibrates the camera and returns the calibration parameters
+        @return calibrationSuccessful
+        @return cameraMatrix
+        @return cameraDistortion
+        @return rotationVectors
+        @return translationVectors
+        """
+        # Instance creation
+        self.calibrate = Calibrate(cap, self.camNum, 15)
+
+        # Return results
+        return self.calibrate.calibrateCamera()
+
     def autoResize(self):
         """
-        Autmatically resizes the capture to the highest resolution.
+        Autmatically resizes the capture to a decent resolution.
         @return resizedCapture
         """
         # Creates a capture
         self.cap = cv.VideoCapture(self.camNum)
 
         # Set the values too high
-        self.cap.set(cv.CAP_PROP_FRAME_WIDTH, HIGH_VALUE)
-        self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, HIGH_VALUE)
+        self.cap.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
+        self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
         self.cap.set(cv.CAP_PROP_FPS, HIGH_VALUE)
 
         # Gets the highest value they go to
@@ -57,21 +74,6 @@ class USBCamera:
         Logger.logInfo("Capture resized")
 
         return self.cap
-
-    def calibrateCamera(self, cap):
-        """
-        Calibrates the camera and returns the calibration parameters
-        @return calibrationSuccessful
-        @return cameraMatrix
-        @return cameraDistortion
-        @return rotationVectors
-        @return translationVectors
-        """
-        # Instance creation
-        self.calibrate = Calibrate(cap, self.camNum, 15)
-
-        # Return results
-        return self.calibrate.calibrateCamera()
 
     def getResolution(self):
         """
