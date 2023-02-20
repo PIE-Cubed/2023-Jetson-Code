@@ -5,7 +5,7 @@ import cv2   as cv
 import numpy as np
 import transforms3d
 import pupil_apriltags
-from wpilib import Timer
+from   wpilib import Timer
 
 # Import Classes
 from communications import NetworkCommunications
@@ -179,31 +179,31 @@ class Detector:
         """
         # Creates object points
         opoints = np.array([
-            -1, -1, 0,
-            1, -1, 0,
-            1,  1, 0,
-            -1,  1, 0,
-            -1, -1, -2 * z_sign,
-            1, -1, -2 * z_sign,
-            1,  1, -2 * z_sign,
-            -1,  1, -2 * z_sign,
-        ]).reshape(-1, 1, 3) * 0.5 * tagSize
+                            -1, -1, 0,
+                            1, -1, 0,
+                            1,  1, 0,
+                            -1,  1, 0,
+                            -1, -1, -2 * z_sign,
+                            1, -1, -2 * z_sign,
+                            1,  1, -2 * z_sign,
+                            -1,  1, -2 * z_sign,
+                        ]).reshape(-1, 1, 3) * 0.5 * tagSize
 
         # Creates edges
         edges = np.array([
-            0, 1,
-            1, 2,
-            2, 3,
-            3, 0,
-            0, 4,
-            1, 5,
-            2, 6,
-            3, 7,
-            4, 5,
-            5, 6,
-            6, 7,
-            7, 4
-        ]).reshape(-1, 2)
+                            0, 1,
+                            1, 2,
+                            2, 3,
+                            3, 0,
+                            0, 4,
+                            1, 5,
+                            2, 6,
+                            3, 7,
+                            4, 5,
+                            5, 6,
+                            6, 7,
+                            7, 4
+                        ]).reshape(-1, 2)
 
         # Calulcates rotation and translation vectors for each AprilTag
         rVecs, _ = cv.Rodrigues(pose[:3,:3])

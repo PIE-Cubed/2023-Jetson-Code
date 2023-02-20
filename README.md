@@ -36,6 +36,8 @@
 
     pip install -U pip wheel setuptools
 </p>
+</br>
+<h3>If on Windows:</h3>
 <p>
 
     pip install transforms3d opencv-contrib-python pupil-apriltags robotpy[apriltag]

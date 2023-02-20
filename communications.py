@@ -2,8 +2,8 @@
 
 # Import Libraries
 import numpy as np
-from networktables import *
-from wpimath.geometry import *
+from   networktables import *
+from   wpimath.geometry import *
 
 # Import Utilities
 from Utilities.Logger import Logger
