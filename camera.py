@@ -9,15 +9,13 @@ from calibration import Calibrate
 # Import Utilities
 from Utilities.Logger import Logger
 
-# CONSTANTS
-HIGH_VALUE = 10000
-
 # Creates the USBCamera class
 class USBCamera:
-    def __init__(self, camNum) -> None:
+    def __init__(self, camNum: int, path: str = None) -> None:
         """
         Constructor for the USBCamera class.
         @param camNumber
+        @param path: It can be found on Linux by running "find /dev/v4l"
         """
         # Set camera properties
         self.camNum = camNum
@@ -27,35 +25,29 @@ class USBCamera:
         self.height = -1
         self.fps    = -1
 
+        # Creates a capture
+        if (path is not None):
+            # If path is known, use the path
+            self.cap = cv.VideoCapture(path)
+        else:
+            # Path is unknown, use the camera number
+            self.cap = cv.VideoCapture(self.camNum)
+
         # Updates log
         Logger.logInfo("USBCamera initialized")
 
-    def calibrateCamera(self, cap):
+    def resize(self, cameraRes: tuple):
         """
-        Calibrates the camera and returns the calibration parameters
-        @return calibrationSuccessful
-        @return cameraMatrix
-        @return cameraDistortion
-        @return rotationVectors
-        @return translationVectors
-        """
-        # Instance creation
-        self.calibrate = Calibrate(cap, self.camNum, 15)
-
-        # Return results
-        return self.calibrate.calibrateCamera()
-
-    def autoResize(self):
-        """
-        Autmatically resizes the capture to a decent resolution.
+        Resizes the capture to a given resolution. If the specified resolution is too high, resizes to the highest resolution possible.
+        @param Camera Resolution
         @return resizedCapture
         """
-        # Creates a capture
-        self.cap = cv.VideoCapture(self.camNum)
+        # CONSTANTS
+        HIGH_VALUE = 10000
 
-        # Set the values too high
-        self.cap.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
-        self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
+        # Set the values
+        self.cap.set(cv.CAP_PROP_FRAME_WIDTH, cameraRes[0])
+        self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, cameraRes[1])
         self.cap.set(cv.CAP_PROP_FPS, HIGH_VALUE)
 
         # Gets the highest value they go to
@@ -74,6 +66,42 @@ class USBCamera:
         Logger.logInfo("Capture resized")
 
         return self.cap
+
+    def undistort(self, stream, cameraMatrix, distortion, resolution: tuple):
+        """
+        Undistorts an image using cv.undistort()
+        @param stream
+        @param cameraMatrix
+        @param cameraDistortion
+        @param cameraResolution (width, height)
+        @return undistortedStream
+        """
+        # Creates a cameraMatrix
+        newCameraMatrix, roi = cv.getOptimalNewCameraMatrix(cameraMatrix, distortion, resolution, 1, resolution)
+
+        # Undistorts the image
+        undistortedStream = cv.undistort(stream, cameraMatrix, distortion, None, newCameraMatrix)
+
+        # Crops the image
+        x, y, w, h = roi
+        undistortedStream = undistortedStream[y:y+h, x:x+w]
+
+        return undistortedStream
+
+    def calibrateCamera(self):
+        """
+        Calibrates the camera and returns the calibration parameters
+        @return calibrationSuccessful
+        @return cameraMatrix
+        @return cameraDistortion
+        @return rotationVectors
+        @return translationVectors
+        """
+        # Instance creation
+        self.calibrate = Calibrate(self.cap, self.camNum, 15)
+
+        # Return results
+        return self.calibrate.calibrateCamera()
 
     def getResolution(self):
         """
