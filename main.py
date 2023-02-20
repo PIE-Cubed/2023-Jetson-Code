@@ -2,6 +2,7 @@
 
 # Import Libraries
 import cv2 as cv
+import numpy as np
 
 # Import Classes
 from camera import USBCamera
@@ -18,6 +19,9 @@ ret, camMatrix, camdistortion, rvecs, tvecs = camera.calibrateCamera(cap)
 
 # Main loop
 while (cap.isOpened() == True):
+    # Prealocate space for the stream
+    stream = np.zeros(shape = (camresolution[0], camresolution[1], 3), dtype = np.uint8)
+
     # Read the capture
     sucess, stream = cap.read()
 
