@@ -83,7 +83,7 @@ class AprilTagFieldLayout:
         @param name: The name of the json file 
         """
         # Opens the json
-        file = open("../" + name + ".json")
+        file = open("/home/robolions/Documents/2023-Jetson-Code-Test/TagLayout/" + name + ".json")
 
         # Returns JSON object as a dictionary
         data = json.load(file)

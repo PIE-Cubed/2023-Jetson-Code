@@ -17,11 +17,12 @@ criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 # Creates the Calibrate class
 class Calibrate:
-    def __init__(self, cap, camNum: int, numImages = 15) -> None:
+    def __init__(self, cap, camNum: int, numImages: int = 15) -> None:
         """
         Constructor for the Calibrate class.
         @param VideoCapture
         @param Camera Number
+        @param Number of Calibration Images
         """
         # Localizes parameters
         self.cap               = cap
@@ -231,7 +232,7 @@ class Calibrate:
             Logger.logError("{}".format(e))
 
         # Attempts to read the last callibration image and updates variables accordingly
-        img = cv.imread(self.PATH + "{}".format(self.calibrationImages) + self.EXTENSION)
+        img = cv.imread(self.PATH + str(self.calibrationImages) + self.EXTENSION)
 
         # Determines if the calibration imgaes exist
         if img is not None:

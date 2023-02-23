@@ -3,14 +3,10 @@
 	A repository that contains code to will run on FRC 2199's Nvidia Jetson Nano coprocessor during the 2023 season.
 </p>
 
-</br>
-
 <h2> Setting Up the Jetson </h2>
 <p>
 	Please see the instructions <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/wiki/Setup#----setting-up-the-jetson-nano" target="_blank">here</a> for setting up a Nvidia Jetson Nano.
 </p>
-
-</br>
 
 <h2> Prerequisites </h2>
 <p>
@@ -24,8 +20,6 @@
 	</ul>
 </p>
 
-</br>
-
 <h2> How to install on Linux </h2>
 <p>
     On linux run the following commands in order from terminal:
@@ -34,32 +28,20 @@
 </p>
 <p>
 
-    pip install -U pip wheel setuptools
+    pip install -U pip wheel setuptools transforms3d opencv-contrib-python pupil-apriltags robotpy[cscore]
 </p>
-</br>
-<h3>If on Windows:</h3>
-<p>
-
-    pip install transforms3d opencv-contrib-python pupil-apriltags robotpy[apriltag]
-</p>
-
-</br>
 
 <h2> How to install on Windows: </h2>
 <p>
     Install <a href="https://www.python.org/downloads/release/python-3108/" target="_blank">Python 3.10.8</a> for Windows, being sure to add Python to PATH. Then, install the required packages using this command:</li>
     
-    pip install transforms3d opencv-contrib-python pupil-apriltags robotpy[apriltag]
+    pip install -U pip wheel setuptools transforms3d opencv-contrib-python pupil-apriltags robotpy[cscore]
 </p>
-
-</br>
 
 <h2> Writing Programs for Jetson </h2>
 <p>
 	This is addressed in the repository's wiki at <a href="https://github.com/PIE-Cubed/2023-Jetson-Code/wiki" target="_blank">https://github.com/PIE-Cubed/2023-Jetson-Code/wiki</a>.
 </p>
-
-</br>
 
 <h2> More details </h2>
 <p>
