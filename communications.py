@@ -1,9 +1,7 @@
 # Created by Alex Pereira
 
 # Import Libraries
-import numpy as np
-from   networktables import *
-from   wpimath.geometry import *
+from networktables import *
 
 # Import Utilities
 from Utilities.Logger import Logger
@@ -53,24 +51,17 @@ class NetworkCommunications:
         @param result
         """
         # Gets variables from result
-        tagId       = result[0]
-        pose        = result[1]
-        eulerAngles = result[2]
+        tagId = result[0]
+        pose  = result[1]
 
         # Sets the tag value
         self.setBestResultId(tagId)
 
-        # Flattens the pose array into a 1D array
-        flatPose = np.array(pose).flatten()
-
-        # Flattens the eulerAngles array into a 1D array
-        flatAngles = np.array(eulerAngles).flatten()
-
         # Extracts the x, y, and z translations relative to the field's WCS
-        x, y, z = flatPose[11], flatPose[3], -flatPose[7]
+        x, y, z = pose.X(), pose.Y(), pose.Z()
 
         # Extracts the tag's roll, yaw, and pitch relative to the field's WCS
-        roll, pitch, yaw = flatAngles[2], flatAngles[0], flatAngles[1]
+        roll, pitch, yaw = pose.rotation().X(), pose.rotation().Y(), pose.rotation().Z()
 
         # Packs all the data
         data = (tagId, x, y, z, roll, pitch, yaw)

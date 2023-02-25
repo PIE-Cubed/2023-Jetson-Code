@@ -8,7 +8,7 @@ from   cscore import CameraServer as CS
 # Get a default network table
 nt = ntcore.NetworkTableInstance.getDefault()
 nt.setServerTeam(2199)
-nt.startClient4(__file__)
+nt.startClient3(__file__)
 
 # Creates the Streaming Class
 class Streaming:

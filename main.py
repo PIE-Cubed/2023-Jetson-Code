@@ -39,10 +39,10 @@ while (cap.isOpened() == True):
     stream = camera.undistort(stream, camMatrix, camdistortion, cameraRes)
 
     # Runs April Tag detection on the undistorted image
-    results, stream = detector.detectTags(stream, camMatrix, 0)
+    results, stream = detector.detectTags(stream, camMatrix, 3)
 
     # Displays the capture
-    # cv.imshow("Stream", stream)
+    cv.imshow("Stream", stream)
 
     # Press q to end the program
     if ( cv.waitKey(1) == ord("q") ):
