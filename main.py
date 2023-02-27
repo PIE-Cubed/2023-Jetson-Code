@@ -36,7 +36,7 @@ while (cap.isOpened() == True):
     sucess, stream = cap.read()
 
     # Undistorts the image
-    stream = camera.undistort(stream, camMatrix, camdistortion, cameraRes)
+    stream = camera.rectify(stream, camMatrix, camdistortion, cameraRes)
 
     # Runs April Tag detection on the undistorted image
     results, stream = detector.detectTags(stream, camMatrix, 3)

@@ -88,6 +88,30 @@ class USBCamera:
 
         return undistortedStream
 
+    def rectify(self, stream, cameraMatrix, distortion, resolution: tuple):
+        """
+        Undistorts an image using cv.remap()
+        @param stream
+        @param cameraMatrix
+        @param cameraDistortion
+        @param cameraResolution (width, height)
+        @return undistortedStream
+        """
+        # Creates a cameraMatrix
+        newCameraMatrix, roi = cv.getOptimalNewCameraMatrix(cameraMatrix, distortion, resolution, 1, resolution)
+
+        # Unpacks the ROI data
+        x, y, w, h = roi
+
+        # Undistorts the image
+        mapx, mapy = cv.initUndistortRectifyMap(cameraMatrix, distortion, None, newCameraMatrix, (w,h), 5)
+        undistortedStream = cv.remap(stream, mapx, mapy, cv.INTER_LINEAR)
+
+        # Crop the image
+        undistortedStream = undistortedStream[y:y+h, x:x+w]
+
+        return undistortedStream
+
     def calibrateCamera(self):
         """
         Calibrates the camera and returns the calibration parameters

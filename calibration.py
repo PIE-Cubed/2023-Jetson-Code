@@ -10,7 +10,7 @@ import numpy as np
 from Utilities.Logger import Logger
 
 # Defines the dimensions of the chessboard
-CHESSBOARD = (7, 7)  # Number of interior corners (width in squares - 1 x height in squares - 1)
+CHESSBOARD = (8, 5)  # Number of interior corners (width in squares - 1 x height in squares - 1)
 
 # Default termination criteria
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -34,8 +34,9 @@ class Calibrate:
         self.height = int(self.cap.get(cv.CAP_PROP_FRAME_HEIGHT))
 
         # Prepare object points
+        squareLength = 27.5  # mm
         self.objp = np.zeros((1, CHESSBOARD[0] * CHESSBOARD[1], 3), np.float32)
-        self.objp[0, :, :2] = np.mgrid[0:CHESSBOARD[0], 0:CHESSBOARD[1]].T.reshape(-1, 2)
+        self.objp[0, :, :2] = np.mgrid[0:CHESSBOARD[0], 0:CHESSBOARD[1]].T.reshape(-1, 2) * squareLength
 
         # Arrays to store object and image points from all images
         self.objPoints = []  # 3D point in real world
@@ -133,7 +134,7 @@ class Calibrate:
             self.doOver = False
 
         # Calibrate the camera by passing the value of known 3D points (objPoints) and corresponding pixel coordinates of the detected corners (imgPoints)
-        self.ret, self.cameraMatrix, self.distortion, self.rVecs, self.tVecs = cv.calibrateCamera(self.objPoints, self.imgPoints, gray.shape[::-1], None, None)
+        ret, self.cameraMatrix, self.distortion, self.rVecs, self.tVecs = cv.calibrateCamera(self.objPoints, self.imgPoints, gray.shape[::-1], None, None)
 
         # Calculates the reprediction error
         repredictError = self.calculateRepredictionError()
@@ -143,7 +144,7 @@ class Calibrate:
         Logger.logInfo("Camera Properties: \nCamera Matrix: \n{}, \nDistortion Matrix: \n{}, \nRotation Vectors: \n{}, \nTranslation Vectors: \n{}, \nAverage Reprediction Value: {}".format(self.cameraMatrix, self.distortion, self.rVecs, self.tVecs, repredictError))
 
         # Return calibration results
-        return self.ret, self.cameraMatrix, self.distortion, self.rVecs, self.tVecs
+        return ret, self.cameraMatrix, self.distortion, self.rVecs, self.tVecs
 
     def createCalibrationImages(self):
         """

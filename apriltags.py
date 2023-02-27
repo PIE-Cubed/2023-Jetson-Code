@@ -11,7 +11,7 @@ from   wpimath.geometry import Pose3d, Rotation3d, Translation3d
 from communications import NetworkCommunications
 
 # Import Utilities
-from Utilities.Units import Units
+from Utilities.Units  import Units
 from Utilities.Logger import Logger
 
 # The size of the tag in meters
@@ -98,7 +98,7 @@ class Detector:
                 self.draw_pose_box(stream, camera_matrix, pose)
                 self.draw_pose_axes(stream, camera_matrix, pose, center)
 
-            # Calculate Euler's Angles
+            # Calculate Pose3d
             pose3d = self.getPose3D(pose)
 
             # Adds results to the arrays
@@ -156,7 +156,7 @@ class Detector:
             )
 
             # 
-            print(pose.X() * 39.37, pose.Y() * 39.37, pose.Z() * 39.37, pose.rotation().X() * 180/np.pi, pose.rotation().Y() * 180/np.pi, pose.rotation().Z() * 180/np.pi)
+            print(Units.metersToInches(pose.X()), Units.metersToInches(pose.Y()), Units.metersToInches(pose.Z()), Units.radiansToDegrees(pose.rotation().X()), Units.radiansToDegrees(pose.rotation().Y()), Units.radiansToDegrees(pose.rotation().Z()))
 
             return pose
         else:
