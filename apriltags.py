@@ -23,6 +23,10 @@ class Detector:
         """
         Constructor for the Detector class.
         """
+        # Variables
+        self.startTime = 0
+        self.firstTime = True
+
         # Instance creation
         self.timer = Timer()
         self.comms = NetworkCommunications()
@@ -41,6 +45,14 @@ class Detector:
         @param vizualization: 0 - Highlight, 1 - Highlight + Boxes, 2 - Highlight + Axes, 3 - Highlight + Boxes + Axes
         @return detectionResult, image
         """
+        # Attempts to get the RioStart time
+        tempTime = self.comms.getTime()
+        if ((tempTime != -1) and (self.firstTime == True)):
+            self.firstTime = False
+            self.startTime = tempTime
+        else:
+            pass
+
         # If the stream is not grayscale, create a grayscale copy
         if (len(stream.shape) == 3):
             gray = cv.cvtColor(stream, cv.COLOR_BGR2GRAY)
@@ -57,7 +69,7 @@ class Detector:
         results = []
         maxError = 1e-3
         maxHamming = 1
-        minConfidence = 30
+        minConfidence = 35
 
         # Variables to use in sorting the data
         best = None
@@ -89,6 +101,12 @@ class Detector:
                 # Detected tag is not on field, move to next detection
                 continue
 
+            # Gets current time
+            time = self.timer.getFPGATimestamp() - self.startTime
+
+            # Sets detection time
+            self.comms.setDetectionTimeSec(time)
+
             # Draws varying levels of information onto the image
             if (vizualization == 1):
                 self.draw_pose_box(stream, camera_matrix, pose)
@@ -119,12 +137,6 @@ class Detector:
             self.comms.setTargetValid(True)
         else:
             self.comms.setTargetValid(False)
-
-        # Gets current time
-        time = self.timer.getFPGATimestamp()
-
-        # Sets detection time
-        self.comms.setDetectionTimeSec(time)
 
         return results, stream
 
