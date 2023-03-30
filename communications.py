@@ -6,6 +6,9 @@ from networktables import *
 # Import Utilities
 from Utilities.Logger import Logger
 
+# Variables
+firstTime = True
+
 # Creates the NetworkCommunications Class
 class NetworkCommunications:
     def __init__(self) -> None:
@@ -18,16 +21,46 @@ class NetworkCommunications:
         # Get a NetworkTables Instance
         ntinst = NetworkTablesInstance.getDefault()
 
-        # Create a TagInfo Table and its entries
+        # FMSInfo Table
+        FMSInfo = ntinst.getTable("FMSInfo")
+        self.isRedAlliance = FMSInfo.getEntry("IsRedAlliance")  # Boolean
+
+        # Create a TagInfo Table and its Entries
         TagInfo = ntinst.getTable("TagInfo")
-        self.targetValid   = TagInfo.getEntry("tv")            # bool
-        self.time          = TagInfo.getEntry("time")          # double
-        self.bestResult    = TagInfo.getEntry("BestResult")    # double[]
-        self.bestResultId  = TagInfo.getEntry("BestResultId")  # double
-        self.detectionTime = TagInfo.getEntry("DetectionTime") # double
+        self.targetValid   = TagInfo.getEntry("tv")            # Boolean
+        self.bestResult    = TagInfo.getEntry("BestResult")    # Double[]
+        self.bestResultId  = TagInfo.getEntry("BestResultId")  # Double
+        self.detectionTime = TagInfo.getEntry("DetectionTime") # Double
 
         # Updates log
         Logger.logInfo("NetworkCommunications initialized")
+
+    # # *****   TJM   *****
+    # # Jetson code is a client (not roborio or driverStation)
+    # # Jetson code is a publisher of topics for the table
+    # # It appears that all topics need to be the same type in the table.  Some way around this??? generic???
+    # # An Entry(above) can be used to subscribe & publish.  We are just publishing here.
+    # # client code from   https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
+    # # publish code from  https://docs.wpilib.org/en/stable/docs/software/networktables/publish-and-subscribe.html
+    # def init_TJM(self)
+    #     ninst = NetworkTableInstance.getDefault()
+    #
+    #     # create new table
+    #     table = ninst.getTable("TagInfo_TJM");
+    #
+    #     # create topics in new table
+    #     x = table.getDoubleTopic("x").publish(0.0);
+    #     y = table.getDoubleTopic("y").publish(0.0);
+    #
+    #     # create new client
+    #     inst.startClient4("jetson client");
+    #
+    #     # connect to server on roborio
+    #     inst.setServerTeam(2199);
+    #
+    #     # set values to be published and read by all subscribers
+    #     x.set(1.0)
+    #     y.set(2.0)
 
     def setBestResultId(self, id: int):
         """
@@ -76,10 +109,3 @@ class NetworkCommunications:
         @param timeSec
         """
         self.detectionTime.setDouble(timeSec)
-
-    def getTime(self) -> float:
-        """
-        Gets the time from the Rio.
-        @return time
-        """
-        return self.time.getBoolean(-1)
