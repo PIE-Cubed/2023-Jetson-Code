@@ -8,8 +8,8 @@ from   frc_apriltags import Detector, USBCamera, BasicStreaming, CustomStreaming
 from   frc_apriltags.Utilities import Logger
 
 # Import classes
-from Pipelines.cones import ConeTracking
-from Pipelines.cubes import CubeTracking
+from   Pipelines.cones import ConeTracking
+from   Pipelines.cubes import CubeTracking
 
 # Gets the directory path
 dirPath = Path(__file__).absolute().parent.__str__()
@@ -21,16 +21,16 @@ cube     = CubeTracking()
 detector = Detector()
 
 # Defines the camera resolutions (width x height)
-tagCamRes = (1280, 720)
 driverRes = (320, 240)
+tagCamRes = (1280, 720)
 
-# Creates a VideoCapture and calibrates it
+# Creates a USBCamera and calibrates it
 camera0   = USBCamera(camNum = 0, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.4:1.0-video-index0", resolution = tagCamRes, calibrate = True, dirPath = dirPath)
 camMatrix = camera0.getMatrix()
 
 # Creates cameras for the drivers
-camera1   = BasicStreaming (camNum = 1, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1:1.0-video-index0", resolution = driverRes)
-camera2   = CustomStreaming(camNum = 2, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2:1.0-video-index0", resolution = driverRes)
+camera1 = BasicStreaming (camNum = 1, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1:1.0-video-index0", resolution = driverRes)
+camera2 = CustomStreaming(camNum = 2, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2:1.0-video-index0", resolution = driverRes)
 
 # Prealocate space for streams
 cam0Stream = camera0.prealocateSpace()
