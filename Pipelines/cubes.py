@@ -214,4 +214,4 @@ class CubeTracking:
 
                 retX.append(x + w/2)
                 output.append(box)
-        return output, retX
+        return retX, output
