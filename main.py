@@ -16,9 +16,9 @@ dirPath = Path(__file__).absolute().parent.__str__()
 Logger.setLogPath(dirPath)
 
 # Instance creation
-cone      = ConeTracking()
-cube      = CubeTracking()
-detector  = Detector()
+cone     = ConeTracking()
+cube     = CubeTracking()
+detector = Detector()
 
 # Defines the camera resolutions (width x height)
 tagCamRes = (1280, 720)
@@ -28,12 +28,12 @@ driverRes = (320, 240)
 camera0   = USBCamera(camNum = 0, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.4:1.0-video-index0", resolution = tagCamRes, calibrate = True, dirPath = dirPath)
 camMatrix = camera0.getMatrix()
 
-# Creates a camera for the drivers
-camera1 = BasicStreaming (camNum = 1, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1:1.0-video-index0", resolution = driverRes)
-camera2 = CustomStreaming(camNum = 2, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2:1.0-video-index0", resolution = driverRes)
+# Creates cameras for the drivers
+camera1   = BasicStreaming (camNum = 1, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1:1.0-video-index0", resolution = driverRes)
+camera2   = CustomStreaming(camNum = 2, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2:1.0-video-index0", resolution = driverRes)
 
 # Prealocate space for streams
-tagStream  = camera0.prealocateSpace()
+cam0Stream = camera0.prealocateSpace()
 cam2Stream = camera2.prealocateSpace()
 
 # Get a NetworkTables Instance
@@ -54,17 +54,18 @@ def processStream(stream):
     """
     # Variables
     sentX = 1e6
-    xVals = []
-    boxList  = []
+    xVals, boxList, pieces = [], [], []
     cubeX, cubeBoxes = cube.findCubes(stream)
     coneX, coneBoxes = cone.findCones(stream)
 
     # Adds the x vaules and boxes to their respective arrays
     for x, box in zip(cubeX, cubeBoxes):
-        xVals.append(x)
+        xVals  .append(x)
+        pieces .append(0)
         boxList.append(box)
     for x, box in zip(coneX, coneBoxes):
-        xVals.append(x)
+        xVals  .append(x)
+        pieces .append(1)
         boxList.append(box)
 
     # Calculates the center position
@@ -77,11 +78,14 @@ def processStream(stream):
         sentX = 0
 
     # Draws the boxes on the stream
-    for box in boxList:
-        stream = cv.drawContours(stream, [box], 0, (255, 0, 0), 3)
+    for box, piece in zip(boxList, pieces):
+        if (piece == 0):
+            stream = cv.drawContours(stream, [box], 0, (255, 0, 0), 2)
+        elif (piece == 1):
+            stream = cv.drawContours(stream, [box], 0, (0, 255, 255), 2)
 
     # Sends all relevant data
-    centerX.setDouble(x)
+    centerX .setDouble(sentX)
     numCubes.setDouble(len(cubeX))
     numCones.setDouble(len(coneX))
     stream = camera2.streamImage(stream)
@@ -94,19 +98,16 @@ def main():
     """
     while (True):
         # Gets the tag camera's undistorted stream
-        tagStream = camera0.getUndistortedStream()
+        cam0Stream = camera0.getUndistortedStream()
 
         # Runs April Tag detection on the undistorted stream
-        detector.detectTags(tagStream, camMatrix)
+        detector.detectTags(cam0Stream, camMatrix)
 
         # Gets camera2's stream
         cam2Stream = camera2.getStream()
 
         # Processes camera2's stream
-        cam2Stream = processStream(cam2Stream)
-
-        # Sends the stream back
-        camera2.streamImage(cam2Stream)
+        processStream(cam2Stream)
 
         # Press q to end the program
         if ( camera0.getEnd() == True ):
