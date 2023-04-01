@@ -1,14 +1,8 @@
 <grip:Pipeline>
   <sources>
-    <grip:ImageFile>
-      <property name="path" value="C:\Users\alper\Pictures\20230328_210920.jpg"/>
-    </grip:ImageFile>
-    <grip:ImageFile>
-      <property name="path" value="C:\Users\alper\Pictures\20230328_210926.jpg"/>
-    </grip:ImageFile>
-    <grip:ImageFile>
-      <property name="path" value="C:\Users\alper\Pictures\20230328_210932.jpg"/>
-    </grip:ImageFile>
+    <grip:Camera>
+      <property name="address" value="http://10.21.99.100:1182/stream.mjpg"/>
+    </grip:Camera>
   </sources>
   <steps>
     <grip:Step name="RGB Threshold">
@@ -36,7 +30,7 @@
     <grip:Step name="Mask">
       <grip:Input step="1" socket="0"/>
       <grip:Input step="1" socket="1"/>
-      <grip:Output step="1" socket="0" previewed="false"/>
+      <grip:Output step="1" socket="0" previewed="true"/>
     </grip:Step>
     <grip:Step name="HSV Threshold">
       <grip:Input step="2" socket="0"/>
@@ -83,10 +77,10 @@
     <grip:Step name="Filter Contours">
       <grip:Input step="5" socket="0"/>
       <grip:Input step="5" socket="1">
-        <value>500.0</value>
+        <value>10.0</value>
       </grip:Input>
       <grip:Input step="5" socket="2">
-        <value>500.0</value>
+        <value>10.0</value>
       </grip:Input>
       <grip:Input step="5" socket="3">
         <value>0.0</value>
@@ -123,28 +117,28 @@
   </steps>
   <connections>
     <grip:Connection>
-      <grip:Output source="2" socket="0" previewed="true"/>
-      <grip:Input step="0" socket="0"/>
-    </grip:Connection>
-    <grip:Connection>
-      <grip:Output step="4" socket="0" previewed="false"/>
-      <grip:Input step="5" socket="0"/>
+      <grip:Output step="2" socket="0" previewed="false"/>
+      <grip:Input step="3" socket="0"/>
     </grip:Connection>
     <grip:Connection>
       <grip:Output step="3" socket="0" previewed="false"/>
       <grip:Input step="4" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output step="1" socket="0" previewed="false"/>
-      <grip:Input step="2" socket="0"/>
-    </grip:Connection>
-    <grip:Connection>
-      <grip:Output source="2" socket="0" previewed="true"/>
+      <grip:Output source="0" socket="0" previewed="true"/>
       <grip:Input step="1" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output step="2" socket="0" previewed="false"/>
-      <grip:Input step="3" socket="0"/>
+      <grip:Output step="4" socket="0" previewed="false"/>
+      <grip:Input step="5" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output source="0" socket="0" previewed="true"/>
+      <grip:Input step="0" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="1" socket="0" previewed="true"/>
+      <grip:Input step="2" socket="0"/>
     </grip:Connection>
     <grip:Connection>
       <grip:Output step="0" socket="0" previewed="false"/>
@@ -164,7 +158,7 @@
     <language>Python</language>
     <className>CubeTracking</className>
     <implementWpilibPipeline>false</implementWpilibPipeline>
-    <saveDir>C:\Users\alper\Documents\FRC\2023\2199 Software\2023 Jetson Code (Testing)\OpenCV Pipelines</saveDir>
+    <saveDir>C:\Users\robol\GRIP</saveDir>
     <packageName></packageName>
     <moduleName>cubes</moduleName>
   </codeGenerationSettings>
