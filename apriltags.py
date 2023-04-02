@@ -1,6 +1,7 @@
 # Created by Alex Pereira
 
 # Import Libraries
+import math
 import cv2   as cv
 import numpy as np
 import pupil_apriltags
@@ -55,13 +56,16 @@ class Detector:
 
         # Variables to use in detections
         results = []
-        maxError = 1e-3
-        maxHamming = 1
-        minConfidence = 30
+        maxError = 5e-6
+        maxHamming = 0
+        minConfidence = 50
 
         # Variables to use in sorting the data
         best = None
-        maxMargin = 0
+        minError = 1000
+
+        # Gets current time
+        time = self.timer.getFPGATimestamp()
 
         # Access the 3D pose of all detected tag
         for tag in detections:
@@ -89,6 +93,9 @@ class Detector:
                 # Detected tag is not on field, move to next detection
                 continue
 
+            # Sets detection time
+            self.comms.setDetectionTimeSec(time)
+
             # Draws varying levels of information onto the image
             if (vizualization == 1):
                 self.draw_pose_box(stream, camera_matrix, pose)
@@ -106,8 +113,8 @@ class Detector:
             results.append(result)
 
             # Determines if the current decision margin is larger than the last one and stores the corresponding data
-            if (decision_margin > maxMargin):
-                maxMargin = decision_margin
+            if (error < minError):
+                minError = error
                 best = result
 
         # Stores the best result in NetworkTables
@@ -119,12 +126,6 @@ class Detector:
             self.comms.setTargetValid(True)
         else:
             self.comms.setTargetValid(False)
-
-        # Gets current time
-        time = self.timer.getFPGATimestamp()
-
-        # Sets detection time
-        self.comms.setDetectionTimeSec(time)
 
         return results, stream
 
@@ -162,16 +163,16 @@ class Detector:
             z = -tempTrans.Y()
 
             # Create a Rotation3d object
-            rot = Rotation3d(tempRot.Z(), -tempRot.X(), -tempRot.Y())
+            rot = Rotation3d(round(tempRot.Z(), 2), round(-tempRot.X(), 2), round(-tempRot.Y(), 2))
 
             # Calulates the field relative X and Y coordinate
             yTrans = Translation2d(tempX, y).rotateBy(Rotation2d(-rot.Z()))
-            x = yTrans.X()
-            y = yTrans.Y()
+            x = round(yTrans.X(), 2)
+            y = round(yTrans.Y(), 2)
 
-            # Calulates the field relative Z coordinate
+            # Calculates the field relative Z coordinate
             zTrans = Translation2d(tempX, z).rotateBy(Rotation2d(np.pi + rot.Y()))
-            z = zTrans.Y()
+            z = round(zTrans.Y(), 2)
 
             # Create a Translation3d object
             trans = Translation3d(x, y, z)
