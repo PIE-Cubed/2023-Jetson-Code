@@ -30,15 +30,15 @@ driverRes = (320, 240)
 tagCamRes = (1280, 720)
 
 # Creates a USBCamera and calibrates it
-camera0   = USBCamera(camNum = 0, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.4:1.0-video-index0", resolution = tagCamRes, calibrate = True, dirPath = dirPath)
-camMatrix = camera0.getMatrix()
+#camera0   = USBCamera(camNum = 0, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.4:1.0-video-index0", resolution = tagCamRes, calibrate = True, dirPath = dirPath)
+#camMatrix = camera0.getMatrix()
 
 # Creates cameras for the drivers
-camera1 = Streaming(camNum = 1, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1:1.0-video-index0", resolution = driverRes)
-camera2 = Streaming(camNum = 2, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2:1.0-video-index0", resolution = driverRes)
+camera2 = Streaming(camNum = 2, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.1:1.0-video-index0", resolution = driverRes)
+camera1 = Streaming(camNum = 1, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2:1.0-video-index0", resolution = driverRes)
 
 # Prealocate space for streams
-cam0Stream = camera0.prealocateSpace()
+#cam0Stream = camera0.prealocateSpace()
 cam2Stream = camera2.prealocateSpace()
 
 # Get a NetworkTables Instance
@@ -59,34 +59,36 @@ def processStream(stream):
     :return: The processed stream.
     """
     # Variables
-    sentX = 1e6
-    xVals, boxList, pieces = [], [], []
-    cubeBoxes = cube.findCubes(stream)
-    coneBoxes = cone.findCones(stream)
+    sentX, maxArea = 0, 0
+    xVals, areas, boxList, pieces = [], [], [], []
+    cubeBoxes, cubeAreas = cube.findCubes(stream)
+    coneBoxes, coneAreas = cone.findCones(stream)
 
     # Adds the x vaules and boxes to their respective arrays
-    if (len(cubeBoxes) != 0):
-        for box in cubeBoxes:
+    if (len(cubeBoxes) != 0 and len(cubeAreas)):
+        for box, area in zip(cubeBoxes, cubeAreas):
             xVals  .append(box[0] + box[2]/2)
+            areas  .append(area)
             pieces .append(0)
             boxList.append(box)
-    if (len(coneBoxes) != 0):
-        for box in coneBoxes:
+    if (len(coneBoxes) != 0 and len(coneAreas)):
+        for box, area in zip(coneBoxes, coneAreas):
             xVals  .append(box[0] + box[2]/2)
+            areas  .append(area)
             pieces .append(1)
             boxList.append(box)
 
     # Calculates the center position
-    if (len(xVals) != 0):
-        for x in xVals:
-            tempX = x - stream.shape[1] / 2
-            if (abs(tempX) < abs(sentX)):
+    if (len(xVals) != 0 and len(areas) != 0):
+        for x, area in zip(xVals, areas):
+            tempX = x - (stream.shape[1] / 2)
+            if (area >= maxArea):
                 sentX = int(tempX)
     else:
         sentX = 0
 
     # Draws the boxes on the stream
-    if (len(boxList) != 0):
+    if (len(boxList) != 0 and len(pieces) != 0):
         for box, piece in zip(boxList, pieces):
             x, y, w, h = box[0], box[1], box[2], box[3]
             if (piece == 0):
@@ -115,16 +117,15 @@ def main():
         #detector.detectTags(cam0Stream, camMatrix)
 
         # Gets camera2's stream
-        cam2Stream = camera0.getStream()
+        cam2Stream = camera2.getStream()
 
         # Processes camera2's stream
-        cam2Stream = processStream(cam2Stream)
-
-        cv.imshow("Stream", cam2Stream)
+        processStream(cam2Stream)
 
         # Press q to end the program
-        if ( camera0.getEnd() == True ):
-            break
+        #if ( camera0.getEnd() == True ):
+        #    break
+        cv.waitKey(1)
 
     # Exits the main function
     return

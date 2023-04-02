@@ -102,9 +102,9 @@ def filter_contours(input_contours, min_area, min_perimeter, min_width, max_widt
                 continue
 
             boxes.append([x / fx, y / fy, w / fx, h / fy])
-            output.append(contour)
+            output.append(area)
 
-    return np.array(boxes, dtype = np.int64).tolist()
+    return np.array(boxes, dtype = np.int64).tolist(), output
 
 class CubeTracking:
     """
