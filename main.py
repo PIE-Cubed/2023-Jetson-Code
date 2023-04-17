@@ -38,7 +38,7 @@ camera2 = Streaming(camNum = 2, path = "/dev/v4l/by-path/platform-70090000.xusb-
 camera1 = Streaming(camNum = 1, path = "/dev/v4l/by-path/platform-70090000.xusb-usb-0:2.2:1.0-video-index0", resolution = driverRes)
 
 # Prealocate space for streams
-#cam0Stream = camera0.prealocateSpace()
+#cam1Stream = camera1.prealocateSpace()
 cam2Stream = camera2.prealocateSpace()
 
 # Get a NetworkTables Instance
