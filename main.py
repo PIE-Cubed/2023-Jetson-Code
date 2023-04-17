@@ -21,11 +21,13 @@ dirPath = Path(__file__).absolute().parent.__str__()
 Logger.setLogPath(dirPath)
 
 # Instance creation
+
 cone     = ConeTracking()
 cube     = CubeTracking()
 detector = Detector()
 
 # Defines the camera resolutions (width x height)
+
 driverRes = (320, 240)
 tagCamRes = (1280, 720)
 
